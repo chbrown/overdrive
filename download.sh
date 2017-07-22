@@ -14,8 +14,8 @@ OS=10.11.6
 # fake user agent to match app's
 UserAgent="OverDrive Media Console"
 
-# hard-coded Client ID
-ClientID="5F2FA52A-9DC9-8675-5228-11A75F5666C5"
+# generate random Client ID
+ClientID=$(uuid | tr /a-z/ /A-Z/)
 
 # the input odm file
 odm="$1"
