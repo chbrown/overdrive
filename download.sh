@@ -15,7 +15,7 @@ OS=10.11.6
 UserAgent="OverDrive Media Console"
 
 # hard-coded Client ID
-ClientID="EA21E624-F199-5A3E-565B-518A9E0E73BF"
+ClientID="5F2FA52A-9DC9-8675-5228-11A75F5666C5"
 
 # the input odm file
 odm="$1"
@@ -50,7 +50,7 @@ while read -r path; do
   suffix=${path##*-}
   output="$Title-$suffix"
   printf "Downloading %s\n" "$output"
-  echo curl -L \
+  curl -L \
     -A "$UserAgent" \
     -H "License: $License" \
     -H "ClientID: $ClientID" \
