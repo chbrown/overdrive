@@ -31,7 +31,7 @@ which contains a long Base64-encoded `<Signature>`.
 (Now back to the script)
 
 * Extract the `Title` value from the `CDATA` content nested in `Novel.odm`.
-* For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint, which will validate the request and redirect to the actual MP3 file on their CDN, and save the result to a file named like `Title -Part0N.mp3`.
+* For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint, which will validate the request and redirect to the actual MP3 file on their CDN, and save the result to a file named like `Title-Part0N.mp3`.
 
 
 ## License
