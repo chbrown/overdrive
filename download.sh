@@ -14,11 +14,12 @@ OS=10.11.6
 # fake user agent to match app's
 UserAgent="OverDrive Media Console"
 
-# generate random Client ID
-ClientID=$(uuid | tr /a-z/ /A-Z/)
-
 # the input odm file
 odm="$1"
+
+# generate random Client ID
+ClientID=$(uuid | tr /a-z/ /A-Z/)
+printf "Using ClientID=%s\n" "$ClientID"
 
 # first extract the "AcquisitionUrl"
 AcquisitionUrl=$(xmlstarlet sel -t -v '/OverDriveMedia/License/AcquisitionUrl' "$odm")
