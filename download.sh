@@ -40,7 +40,7 @@ License=$(cat "$odm.license")
 printf "Using License=%s\n" "$License"
 
 # extract the title
-Title=$(xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$odm" | xmlstarlet sel -t -v '//Title')
+Title=$(xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$odm" | tidy -xml -quiet | xmlstarlet sel -t -v '//Title')
 printf "Using Title=%s\n" "$Title"
 
 # download the parts
