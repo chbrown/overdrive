@@ -43,17 +43,30 @@ fi
 License=$(cat "$odm.license")
 printf "Using License=%s\n" "$License"
 
+extractMetadata() {
+  # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
+  # luckily, it's the only text content at that level
+  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1"
+}
+
 # extract the title
-Title=$(xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$odm" | tidy -xml -quiet | xmlstarlet sel -t -v '//Title')
+Title=$(extractMetadata "$odm" | xmlstarlet sel -t -v '//Title')
 printf "Using Title=%s\n" "$Title"
+
+Author=$(extractMetadata "$odm" | xmlstarlet sel -t -v "//Creator[@role='Author']/text()")
+printf "Using Author=%s\n" "$Author"
 
 # download the parts
 baseurl=$(xmlstarlet sel -t -v '//Protocol[@method="download"]/@baseurl' "$odm")
 
+dir="$Author - $Title"
+printf "Creating directory %s\n" "$dir"
+mkdir -p "$dir"
+
 while read -r path; do
   # delete from path up until the last hyphen to the get Part0N.mp3 suffix
   suffix=${path##*-}
-  output="$Title-$suffix"
+  output="$dir/$Title-$suffix"
   printf "Downloading %s\n" "$output"
   curl -L \
     -A "$UserAgent" \
