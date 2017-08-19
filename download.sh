@@ -35,7 +35,11 @@ Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -s
 printf "Using Hash=%s\n" "$Hash"
 
 # get the license signature
-curl -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$odm.license"
+if [[ -e "$odm.license" ]]; then
+  printf "License already acquired: %s\n" "$odm.license"
+else
+  curl -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$odm.license"
+fi
 License=$(cat "$odm.license")
 printf "Using License=%s\n" "$License"
 
