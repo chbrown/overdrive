@@ -21,14 +21,16 @@ When you run `bash download.sh Novel.odm`, the script performs the following act
   Thanks to https://github.com/jvolkening/gloc for somehow figuring out how to construct that hash.
 * Using those values and a random `ClientID` GUID, submit a request to the OverDrive server to get the full license for this book.
 
-You'll now have a file `Novel.odm.license` in your current folder,
+You'll now have a file `Novel.odm.license` in the same folder as the `Novel.odm` file,
 which is an XML file that has a `<License>` element at the root,
 which contains a long Base64-encoded `<Signature>`.
 
+If that file already exists, the script will not request a new license, since the OverDrive server will only grant one license per `.odm` loan.
+
 (Now back to the script)
 
-* Extract the `Title` value from the `CDATA` content nested in `Novel.odm`.
-* For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint, which will validate the request and redirect to the actual MP3 file on their CDN, and save the result to a file named like `Title-Part0N.mp3`.
+* Extract the `Title` and `Author` values from the `CDATA` content nested in `Novel.odm`.
+* For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint, which will validate the request and redirect to the actual MP3 file on their CDN, and save the result into a folder in the current directory, named like `Author - Title/Title-Part0N.mp3`.
 
 
 ## License

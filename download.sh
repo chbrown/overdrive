@@ -49,14 +49,13 @@ extractMetadata() {
   xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1"
 }
 
-# extract the title
+# extract the title and author
 Title=$(extractMetadata "$odm" | xmlstarlet sel -t -v '//Title')
 printf "Using Title=%s\n" "$Title"
-
 Author=$(extractMetadata "$odm" | xmlstarlet sel -t -v "//Creator[@role='Author']/text()")
 printf "Using Author=%s\n" "$Author"
 
-# download the parts
+# prepare to download the parts
 baseurl=$(xmlstarlet sel -t -v '//Protocol[@method="download"]/@baseurl' "$odm")
 
 dir="$Author - $Title"
