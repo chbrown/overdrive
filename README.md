@@ -8,6 +8,18 @@ Their "OverDrive Media Console" application on Mac OS X is pretty simple, but it
 The shell script [`download.sh`](download.sh) takes a single argument, the path to an `.odm` file (which is XML), and downloads the corresponding files into the current directory.
 
 
+## Prerequisites
+
+This script is tested (i.e., developed and used) on macOS with bash 4.4.
+It depends on the following (potentially non-standard?) executables being available on your `PATH`:
+
+* `uuid`
+* `xmlstarlet`
+* `iconv`
+* `openssl`
+* `base64`
+
+
 ## Instructions
 
 Download an OverDrive loan file from your library or wherever.
