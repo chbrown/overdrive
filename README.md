@@ -44,6 +44,22 @@ If that file already exists, the script will not request a new license, since th
 * Extract the `Title` and `Author` values from the `CDATA` content nested in `Novel.odm`.
 * For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint, which will validate the request and redirect to the actual MP3 file on their CDN, and save the result into a folder in the current directory, named like `Author - Title/Title-Part0N.mp3`.
 
+### Debugging
+
+If you have trouble getting the script to run successfully,
+set the `DEBUG` environment variable to `1` and retry, e.g.:
+
+    DEBUG=1 bash download.sh Novel.odm
+
+This will call `set -x` to turn bash's `xtrace` option on,
+which causes a trace of all commands to be printed to standard error,
+prefixed with one or more `+` signs.
+
+If that doesn't help you debug the problem,
+[open an issue](https://github.com/chbrown/overdrive/issues/new),
+including the full debug output (optimally as a [gist](https://gist.github.com/)),
+and I'll try to help you out.
+
 
 ## License
 

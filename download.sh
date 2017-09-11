@@ -8,6 +8,11 @@ HELP
   exit 1
 fi
 
+if [[ -n "$DEBUG" ]]; then
+  printf "Entering debug (verbose) mode\n"
+  set -x
+fi
+
 OMC=1.2.0
 OS=10.11.6
 
