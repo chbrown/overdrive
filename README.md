@@ -44,6 +44,14 @@ If that file already exists, the script will not request a new license, since th
 * Extract the `Title` and `Author` values from the `CDATA` content nested in `Novel.odm`.
 * For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint, which will validate the request and redirect to the actual MP3 file on their CDN, and save the result into a folder in the current directory, named like `Author - Title/Title-Part0N.mp3`.
 
+### Returning
+
+The OverDrive format makes "returning" a loan extremely simple.
+All you have to do is request the URL specified by the `<EarlyReturnURL>` element in the loan file.
+The `return.sh` script does exactly that, e.g.:
+
+    bash return.sh Novel.odm
+
 ### Debugging
 
 If you have trouble getting the script to run successfully,
