@@ -78,4 +78,4 @@ while read -r path; do
     -H "ClientID: $ClientID" \
     --compressed -o "$output" \
     "$baseurl/$path"
-done < <(xmlstarlet sel -t -v '//Part/@filename' "$odm" | tr \\ / | sed -e "s/{/%7B/" -e "s/}/%7D/")
+done < <(xmlstarlet sel -t -v '//Part/@filename' "$odm" | tr '\\' / | sed -e "s/{/%7B/" -e "s/}/%7D/")
