@@ -22,31 +22,35 @@ UserAgent="OverDrive Media Console"
 # the input odm file
 odm="$1"
 
-# generate random Client ID
-ClientID=$(uuid | tr /a-z/ /A-Z/)
-printf "Using ClientID=%s\n" "$ClientID"
-
-# first extract the "AcquisitionUrl"
-AcquisitionUrl=$(xmlstarlet sel -t -v '/OverDriveMedia/License/AcquisitionUrl' "$odm")
-printf "Using AcquisitionUrl=%s\n" "$AcquisitionUrl"
-
-MediaID=$(xmlstarlet sel -t -v '/OverDriveMedia/@id' "$odm")
-printf "Using MediaID=%s\n" "$MediaID"
-
-# Compute the Hash value; thanks to https://github.com/jvolkening/gloc/blob/v0.601/gloc#L1523-L1531
-RawHash="$ClientID|$OMC|$OS|ELOSNOC*AIDEM*EVIRDREVO"
-printf "Using RawHash=%s\n" "$RawHash"
-Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
-printf "Using Hash=%s\n" "$Hash"
-
 # get the license signature
 if [[ -e "$odm.license" ]]; then
   printf "License already acquired: %s\n" "$odm.license"
 else
+  # generate random Client ID
+  ClientID=$(uuid | tr /a-z/ /A-Z/)
+  printf "Generating random ClientID=%s\n" "$ClientID"
+
+  # first extract the "AcquisitionUrl"
+  AcquisitionUrl=$(xmlstarlet sel -t -v '/OverDriveMedia/License/AcquisitionUrl' "$odm")
+  printf "Using AcquisitionUrl=%s\n" "$AcquisitionUrl"
+
+  MediaID=$(xmlstarlet sel -t -v '/OverDriveMedia/@id' "$odm")
+  printf "Using MediaID=%s\n" "$MediaID"
+
+  # Compute the Hash value; thanks to https://github.com/jvolkening/gloc/blob/v0.601/gloc#L1523-L1531
+  RawHash="$ClientID|$OMC|$OS|ELOSNOC*AIDEM*EVIRDREVO"
+  printf "Using RawHash=%s\n" "$RawHash"
+  Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
+  printf "Using Hash=%s\n" "$Hash"
+
   curl -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$odm.license"
 fi
 License=$(cat "$odm.license")
 printf "Using License=%s\n" "$License"
+
+# the license XML specifies a default namespace, which the XPath expression must also reference
+ClientID=$(xmlstarlet sel -N ol=http://license.overdrive.com/2008/03/License.xsd -t -v '/ol:License/ol:SignedInfo/ol:ClientID' "$odm.license")
+printf "Using ClientID=%s from License\n" "$ClientID"
 
 extractMetadata() {
   # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
