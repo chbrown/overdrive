@@ -69,6 +69,15 @@ including the full debug output (optimally as a [gist](https://gist.github.com/)
 and I'll try to help you out.
 
 
+## Post-processing
+
+The most up-to-date ID3(v2) tagging tool I've found is [`mutagen`](https://mutagen.readthedocs.io/),
+which is used and maintained by the [Quod Libet](https://quodlibet.readthedocs.io/) audio player project.
+It was the only tagger that let me set the Genre tag to an arbitrary string (like iTunes).
+
+Unfortunately, it appears that iTunes always loads `.mp3`s as "Music" despite the Genre (there doesn't seem to be any way to import `.mp3`s into iTunes _as_ "Audiobooks", you have to open iTunes, "Get Info" for the intended songs, and set the "Media Kind" to "Audiobook" manually.
+
+
 ## License
 
 Copyright © 2017 Christopher Brown. [MIT Licensed](https://chbrown.github.io/licenses/MIT/#2017).
