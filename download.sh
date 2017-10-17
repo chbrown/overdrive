@@ -8,6 +8,9 @@ HELP
   exit 1
 fi
 
+# exit on first error
+set -e
+
 if [[ -n "$DEBUG" ]]; then
   printf "Entering debug (verbose) mode\n"
   set -x
