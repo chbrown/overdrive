@@ -62,7 +62,7 @@ extractMetadata() {
 }
 
 # extract the title and author
-Title=$(extractMetadata "$odm" | xmlstarlet sel -t -v '//Title')
+Title=$(extractMetadata "$odm" | xmlstarlet sel -t -v '//Title' | tr -Cs '[:alnum:] ._-' -)
 printf "Using Title=%s\n" "$Title"
 Author=$(extractMetadata "$odm" | xmlstarlet sel -t -v "//Creator[@role='Author']/text()" | tr '\n' + | sed 's/+/, /g')
 printf "Using Author=%s\n" "$Author"
