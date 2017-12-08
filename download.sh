@@ -58,7 +58,8 @@ printf "Using ClientID=%s from License\n" "$ClientID"
 extractMetadata() {
   # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
   # luckily, it's the only text content at that level
-  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1"
+  # N.b.: tidy will still write errors & warnings to /dev/stderr, despite the -quiet
+  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1" | tidy -xml -wrap 0 -quiet
 }
 
 # extract the title and author

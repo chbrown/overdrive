@@ -18,6 +18,7 @@ It depends on the following (potentially non-standard?) executables being availa
 * `iconv`
 * `openssl`
 * `base64`
+* `tidy`
 
 
 ## Instructions
