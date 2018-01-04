@@ -12,7 +12,7 @@ The shell script in this repository [`overdrive.sh`](overdrive.sh) takes a seque
 
 The following will install the main script to your `/usr/local/bin` folder and mark it executable:
 
-    curl https://chbrown.github.io/overdrive/overdrive.sh > /usr/local/bin/overdrive
+    curl --compressed https://chbrown.github.io/overdrive/overdrive.sh > /usr/local/bin/overdrive
     chmod +x /usr/local/bin/overdrive
 
 Assuming `/usr/local/bin` is on your `PATH`, you can now run `overdrive --help` to show all the options.
