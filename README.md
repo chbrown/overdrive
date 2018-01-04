@@ -5,7 +5,17 @@ Way to go, Rakuten / OverDrive, fight the man!
 
 Their "OverDrive Media Console" application on Mac OS X is pretty simple, but it's so simple I'm like, why have an app?
 
-The shell script [`download.sh`](download.sh) takes a single argument, the path to an `.odm` file (which is XML), and downloads the corresponding files into the current directory.
+The shell script in this repository [`overdrive.sh`](overdrive.sh) takes a sequence of commands and a list of `.odm` files (which are just XML).
+
+
+## Install
+
+The following will install the main script to your `/usr/local/bin` folder and mark it executable:
+
+    curl https://chbrown.github.io/overdrive/overdrive.sh > /usr/local/bin/overdrive
+    chmod +x /usr/local/bin/overdrive
+
+Assuming `/usr/local/bin` is on your `PATH`, you can now run `overdrive --help` to show all the options.
 
 
 ## Prerequisites
@@ -27,7 +37,7 @@ It depends on the following (potentially non-standard?) executables being availa
 Download an OverDrive loan file from your library or wherever.
 I'll assume that yours is called `Novel.odm`.
 
-When you run `bash download.sh Novel.odm`, the script performs the following actions:
+When you run `overdrive download Novel.odm`, the script performs the following actions:
 
 * Extract the `AcquisitionUrl` and `MediaID` from the `Novel.odm` file.
 * Compute a Base64-encoded SHA-1 hash from a few `|`-separated values and a suffix of `OVERDRIVE*MEDIA*CONSOLE` but backwards.
@@ -50,16 +60,15 @@ If that file already exists, the script will not request a new license, since th
 
 The OverDrive format makes "returning" a loan extremely simple.
 All you have to do is request the URL specified by the `<EarlyReturnURL>` element in the loan file.
-The `return.sh` script does exactly that, e.g.:
+The `return` command does exactly that, e.g.:
 
-    bash return.sh Novel.odm
+    overdrive return Novel.odm
 
 ### Debugging
 
-If you have trouble getting the script to run successfully,
-set the `DEBUG` environment variable to `1` and retry, e.g.:
+If you have trouble getting the script to run successfully, add the `--verbose` flag and retry, e.g.:
 
-    DEBUG=1 bash download.sh Novel.odm
+    overdrive download Novel.odm --verbose
 
 This will call `set -x` to turn bash's `xtrace` option on,
 which causes a trace of all commands to be printed to standard error,
