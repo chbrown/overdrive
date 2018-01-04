@@ -1,29 +1,38 @@
 #!/usr/bin/env bash
-if [[ "${@---help}" =~ '--help' ]]; then
+
+set -e # exit immediately on first error
+
+OMC=1.2.0
+OS=10.11.6
+# use same user agent as mobile app
+UserAgent='OverDrive Media Console'
+
+usage() {
   >&2 cat <<HELP
-Usage: download.sh MyBook.odm
+Usage: $(basename "$0") MyBook.odm
 
 Download the mp3s for an OverDrive book loan.
 HELP
-  exit 1
-fi
+}
 
-# exit on first error
-set -e
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *.odm)
+      # the input odm file
+      odm=$1
+      ;;
+  esac
+  shift
+done
 
 if [[ -n "$DEBUG" ]]; then
   printf 'Entering debug (verbose) mode\n'
   set -x
 fi
-
-OMC=1.2.0
-OS=10.11.6
-
-# fake user agent to match app's
-UserAgent="OverDrive Media Console"
-
-# the input odm file
-odm="$1"
 
 # get the license signature
 if [[ -e "$odm.license" ]]; then
@@ -62,11 +71,19 @@ extractMetadata() {
   xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1" | tidy -xml -wrap 0 -quiet
 }
 
-# extract the title and author
-Title=$(extractMetadata "$odm" | xmlstarlet sel -t -v '//Title' | tr -Cs '[:alnum:] ._-' -)
-printf 'Using Title=%s\n' "$Title"
-Author=$(extractMetadata "$odm" | xmlstarlet sel -t -v "//Creator[@role='Author'][position()<=3]/text()" | tr '\n' + | sed 's/+/, /g')
+extractAuthor() {
+  extractMetadata "$1" | xmlstarlet sel -t -v "//Creator[@role='Author'][position()<=3]/text()" | tr '\n' + | sed 's/+/, /g'
+}
+
+extractTitle() {
+  extractMetadata "$1" | xmlstarlet sel -t -v '//Title' | tr -Cs '[:alnum:] ._-' -
+}
+
+# extract the author and title
+Author=$(extractAuthor "$odm")
 printf 'Using Author=%s\n' "$Author"
+Title=$(extractTitle "$odm")
+printf 'Using Title=%s\n' "$Title"
 
 # prepare to download the parts
 baseurl=$(xmlstarlet sel -t -v '//Protocol[@method="download"]/@baseurl' "$odm")
