@@ -15,6 +15,7 @@ Usage: $(basename "$0") command [command2 ...] book.odm [book2.odm] [-h|--help] 
 Commands:
   download   Download the mp3s for an OverDrive book loan.
   return     Process an early return for an OverDrive book loan.
+  info       Print the author, title, and total duration (in seconds) for each OverDrive loan file.
 HELP
 }
 
@@ -33,7 +34,7 @@ while [[ $# -gt 0 ]]; do
     *.odm)
       MEDIA+=("$1")
       ;;
-    download|return)
+    download|return|info)
       COMMANDS+=("$1")
       ;;
     *)
@@ -100,6 +101,14 @@ extract_title() {
   extract_metadata "$1" | xmlstarlet sel -t -v '//Title' | tr -Cs '[:alnum:] ._-' -
 }
 
+extract_duration() {
+  # Usage: extract_duration book.odm
+
+  # awk -F : '{print $1*60 + $2}' # converts MM:SS into just seconds
+  # awk '{sum += $1} END {print sum}' # sums (first column of) input
+  xmlstarlet sel -t -v '//Part/@duration' "$1" | awk -F : '{print $1*60 + $2}' | awk '{sum += $1} END {print sum}'
+}
+
 download() {
   # Usage: download book.odm
   #
@@ -155,6 +164,11 @@ early_return() {
   >&2 printf '\nFinished returning book\n'
 }
 
+info() {
+  # Usage: info book.odm
+  printf '%s\t%s\t%d\n' "$(extract_author "$1")" "$(extract_title "$1")" "$(extract_duration "$1")"
+}
+
 # now actually loop over the media files and commands
 for ODM in "${MEDIA[@]}"; do
   for COMMAND in "${COMMANDS[@]}"; do
@@ -164,6 +178,9 @@ for ODM in "${MEDIA[@]}"; do
         ;;
       return)
         early_return "$ODM"
+        ;;
+      info)
+        info "$ODM"
         ;;
       *)
         >&2 printf 'Unrecognized command: %s\n' "$COMMAND"
