@@ -106,7 +106,7 @@ extract_duration() {
 
   # awk -F : '{print $1*60 + $2}' # converts MM:SS into just seconds
   # awk '{sum += $1} END {print sum}' # sums (first column of) input
-  xmlstarlet sel -t -v '//Part/@duration' "$1" | awk -F : '{print $1*60 + $2}' | awk '{sum += $1} END {print sum}'
+  xmlstarlet sel -t -v '//Part/@duration' -n "$1" | awk -F : '{print $1*60 + $2}' | awk '{sum += $1} END {print sum}'
 }
 
 download() {
