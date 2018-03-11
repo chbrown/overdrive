@@ -93,7 +93,8 @@ extract_metadata() {
 
 extract_author() {
   # Usage: extract_author book.odm
-  extract_metadata "$1" | xmlstarlet sel -t -v "//Creator[@role='Author'][position()<=3]/text()" | tr '\n' + | sed 's/+/, /g'
+  # Most Creator/@role values for authors are simply "Author" but some are "Author and narrator"
+  extract_metadata "$1" | xmlstarlet sel -t -v "//Creator[starts-with(@role, 'Author')][position()<=3]/text()" | tr '\n' + | sed 's/+/, /g'
 }
 
 extract_title() {
