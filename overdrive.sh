@@ -47,7 +47,7 @@ done
 
 if [[ ${#MEDIA[@]} -eq 0 || ${#COMMANDS[@]} -eq 0 ]]; then
   usage
-  printf '\n'
+  >&2 printf '\n'
   [[ ${#COMMANDS[@]} -eq 0 ]] && >&2 printf 'You must supply at least one command.\n'
   [[ ${#MEDIA[@]} -eq 0 ]] && >&2 printf 'You must supply at least one media file (the .odm extension is required).\n'
   exit 1
