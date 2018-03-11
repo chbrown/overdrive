@@ -16,6 +16,7 @@ Commands:
   download   Download the mp3s for an OverDrive book loan.
   return     Process an early return for an OverDrive book loan.
   info       Print the author, title, and total duration (in seconds) for each OverDrive loan file.
+  metadata   Print all metadata from each OverDrive loan file.
 HELP
 }
 
@@ -34,7 +35,7 @@ while [[ $# -gt 0 ]]; do
     *.odm)
       MEDIA+=("$1")
       ;;
-    download|return|info)
+    download|return|info|metadata)
       COMMANDS+=("$1")
       ;;
     *)
@@ -170,6 +171,11 @@ info() {
   printf '%s\t%s\t%d\n' "$(extract_author "$1")" "$(extract_title "$1")" "$(extract_duration "$1")"
 }
 
+metadata() {
+  # Usage: metadata book.odm
+  extract_metadata "$1" | xmlstarlet fo --omit-decl
+}
+
 # now actually loop over the media files and commands
 for ODM in "${MEDIA[@]}"; do
   for COMMAND in "${COMMANDS[@]}"; do
@@ -182,6 +188,9 @@ for ODM in "${MEDIA[@]}"; do
         ;;
       info)
         info "$ODM"
+        ;;
+      metadata)
+        metadata "$ODM"
         ;;
       *)
         >&2 printf 'Unrecognized command: %s\n' "$COMMAND"
