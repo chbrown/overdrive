@@ -166,8 +166,13 @@ early_return() {
   >&2 printf '\nFinished returning book\n'
 }
 
+HEADER_PRINTED=
 info() {
   # Usage: info book.odm
+  if [[ -z $HEADER_PRINTED ]]; then
+    printf '%s\t%s\t%s\n' author title duration
+    HEADER_PRINTED=1
+  fi
   printf '%s\t%s\t%d\n' "$(extract_author "$1")" "$(extract_title "$1")" "$(extract_duration "$1")"
 }
 
