@@ -10,7 +10,7 @@ UserAgentLong='OverDrive Media Console/3.7.0.28 iOS/10.3.3'
 
 usage() {
   >&2 cat <<HELP
-Usage: $(basename "$0") command [command2 ...] book.odm [book2.odm] [-h|--help] [-v|--verbose]
+Usage: $(basename "$0") command [command2 ...] book.odm [book2.odm ...] [-h|--help] [-v|--verbose]
 
 Commands:
   download   Download the mp3s for an OverDrive book loan.
