@@ -142,12 +142,19 @@ download() {
     suffix=${path##*-}
     output="$dir/$Title-$suffix"
     >&2 printf 'Downloading %s\n' "$output"
-    curl -L \
-      -A "$UserAgent" \
-      -H "License: $(cat "$license_path")" \
-      -H "ClientID: $ClientID" \
-      --compressed -o "$output" \
-      "$baseurl/$path"
+    if curl -L \
+        -A "$UserAgent" \
+        -H "License: $(cat "$license_path")" \
+        -H "ClientID: $ClientID" \
+        --compressed -o "$output" \
+        "$baseurl/$path"; then
+      >&2 printf 'Downloaded %s successfully\n' "$output"
+    else
+      STATUS=$?
+      >&2 printf 'Failed trying to download %s\n' "$output"
+      rm -f "$output"
+      return $STATUS
+    fi
   done < <(xmlstarlet sel -t -v '//Part/@filename' -n "$1" | tr \\ / | sed -e "s/{/%7B/" -e "s/}/%7D/")
 }
 
