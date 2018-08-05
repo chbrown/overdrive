@@ -141,19 +141,23 @@ download() {
     # delete from path up until the last hyphen to the get Part0N.mp3 suffix
     suffix=${path##*-}
     output="$dir/$Title-$suffix"
-    >&2 printf 'Downloading %s\n' "$output"
-    if curl -L \
-        -A "$UserAgent" \
-        -H "License: $(cat "$license_path")" \
-        -H "ClientID: $ClientID" \
-        --compressed -o "$output" \
-        "$baseurl/$path"; then
-      >&2 printf 'Downloaded %s successfully\n' "$output"
+    if [[ -e $output ]]; then
+      >&2 printf 'Output already exists: %s\n' "$output"
     else
-      STATUS=$?
-      >&2 printf 'Failed trying to download %s\n' "$output"
-      rm -f "$output"
-      return $STATUS
+      >&2 printf 'Downloading %s\n' "$output"
+      if curl -L \
+          -A "$UserAgent" \
+          -H "License: $(cat "$license_path")" \
+          -H "ClientID: $ClientID" \
+          --compressed -o "$output" \
+          "$baseurl/$path"; then
+        >&2 printf 'Downloaded %s successfully\n' "$output"
+      else
+        STATUS=$?
+        >&2 printf 'Failed trying to download %s\n' "$output"
+        rm -f "$output"
+        return $STATUS
+      fi
     fi
   done < <(xmlstarlet sel -t -v '//Part/@filename' -n "$1" | tr \\ / | sed -e "s/{/%7B/" -e "s/}/%7D/")
 }
