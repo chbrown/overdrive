@@ -116,7 +116,6 @@ download() {
   #
   # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
   # luckily, it's the only text content at that level
-  # N.b.: tidy will still write errors & warnings to /dev/stderr, despite the -quiet
   license_path=$1.license
   acquire_license "$1" "$license_path"
   >&2 printf 'Using License=%s\n' "$(cat "$license_path")"
