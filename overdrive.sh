@@ -54,6 +54,16 @@ if [[ ${#MEDIA[@]} -eq 0 || ${#COMMANDS[@]} -eq 0 ]]; then
   exit 1
 fi
 
+# sanity check for prerequisites
+prereq="xmlstarlet uuid curl iconv openssl base64 tidy"
+for i in $prereq; do
+  if ! [ -x "$(command -v $i)" ]; then
+      >&2 printf 'Executable %s not found.\n' "$i"
+      >&2 printf 'Please install it first.\n'
+      exit 1
+  fi
+done
+
 acquire_license() {
   # Usage: acquire_license book.odm book.license
   #
@@ -111,6 +121,13 @@ extract_duration() {
   xmlstarlet sel -t -v '//Part/@duration' -n "$1" | awk -F : '{print $1*60 + $2}' | awk '{sum += $1} END {print sum}'
 }
 
+extract_cover_URL() {
+  # Usage: extract_image_path book.odm
+  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1" | \
+      tidy -xml -wrap 0 -quiet|xmlstarlet sel -t -v '//CoverUrl' | 
+      sed -e "s/{/%7B/" -e "s/}/%7D/"
+}
+
 download() {
   # Usage: download book.odm
   #
@@ -129,6 +146,7 @@ download() {
   >&2 printf 'Using Author=%s\n' "$Author"
   Title=$(extract_title "$1")
   >&2 printf 'Using Title=%s\n' "$Title"
+  Cover_URL=$(extract_cover_URL "$1")
 
   # prepare to download the parts
   baseurl=$(xmlstarlet sel -t -v '//Protocol[@method="download"]/@baseurl' "$1")
@@ -160,6 +178,24 @@ download() {
       fi
     fi
   done < <(xmlstarlet sel -t -v '//Part/@filename' -n "$1" | tr \\ / | sed -e "s/{/%7B/" -e "s/}/%7D/")
+
+  if [[ -n "$Cover_URL" ]]; then
+      >&2 printf 'Downloading cover image.\n'
+      cover_file=$dir/folder.jpg
+      if curl -L \
+              -A "$UserAgent" \
+              -o "$cover_file" \
+              "$Cover_URL"; then
+          >&2 printf 'Downloaded cover image successfully.\n'
+      else
+        STATUS=$?
+        >&2 printf 'Failed trying to download cover image.\n'
+        rm -f $cover_file
+        return $STATUS
+      fi
+  else
+    >&2 printf 'Cover image not found.\n'
+  fi
 }
 
 early_return() {
