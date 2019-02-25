@@ -111,6 +111,11 @@ extract_duration() {
   xmlstarlet sel -t -v '//Part/@duration' -n "$1" | awk -F : '{print $1*60 + $2}' | awk '{sum += $1} END {print sum}'
 }
 
+extract_coverUrl() {
+  # Usage: extract_coverUrl book.odm
+  extract_metadata "$1" | xmlstarlet sel -t -v '//CoverUrl' | sed -e "s/{/%7B/" -e "s/}/%7D/"
+}
+
 download() {
   # Usage: download book.odm
   #
@@ -160,6 +165,26 @@ download() {
       fi
     fi
   done < <(xmlstarlet sel -t -v '//Part/@filename' -n "$1" | tr \\ / | sed -e "s/{/%7B/" -e "s/}/%7D/")
+
+  CoverUrl=$(extract_coverUrl "$1")
+  >&2 printf 'Using CoverUrl=%s\n' "$CoverUrl"
+  if [[ -n "$CoverUrl" ]]; then
+      cover_output=$dir/folder.jpg
+      >&2 printf 'Downloading %s\n' "$cover_output"
+      if curl -L \
+          -A "$UserAgent" \
+          --compressed -o "$cover_output" \
+          "$CoverUrl"; then
+        >&2 printf 'Downloaded cover image successfully\n'
+      else
+        STATUS=$?
+        >&2 printf 'Failed trying to download cover image\n'
+        rm -f "$cover_output"
+        return $STATUS
+      fi
+  else
+    >&2 printf 'Cover image not available\n'
+  fi
 }
 
 early_return() {
