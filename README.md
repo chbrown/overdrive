@@ -27,7 +27,7 @@ This script is tested (i.e., developed and used) on macOS with bash 4.4.
 It depends on the following (potentially non-standard?) executables being available on your `PATH`:
 
 * `curl`
-* `uuid`
+* `uuidgen`
 * `xmlstarlet`
 * `iconv`
 * `openssl`

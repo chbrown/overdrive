@@ -63,7 +63,7 @@ acquire_license() {
     >&2 printf 'License already acquired: %s\n' "$2"
   else
     # generate random Client ID
-    ClientID=$(uuid | tr /a-z/ /A-Z/)
+    ClientID=$(uuidgen | tr '[:lower:]' '[:upper:]')
     >&2 printf 'Generating random ClientID=%s\n' "$ClientID"
 
     # first extract the "AcquisitionUrl"
