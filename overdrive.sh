@@ -150,7 +150,7 @@ download() {
       >&2 printf 'Output already exists: %s\n' "$output"
     else
       >&2 printf 'Downloading %s\n' "$output"
-      if curl -L \
+      if curl -sL \
           -A "$UserAgent" \
           -H "License: $(cat "$license_path")" \
           -H "ClientID: $ClientID" \
