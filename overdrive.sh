@@ -22,6 +22,7 @@ HELP
 
 MEDIA=()
 COMMANDS=()
+SILENT_CURL=true
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
@@ -30,6 +31,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -v|--verbose)
       set -x
+      unset SILENT_CURL
       >&2 printf 'Entering debug (verbose) mode\n'
       ;;
     *.odm)
@@ -79,7 +81,7 @@ acquire_license() {
     Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
     >&2 printf 'Using Hash=%s\n' "$Hash"
 
-    curl -s -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
+    curl ${SILENT_CURL:+'-s'} -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
   fi
 }
 
@@ -150,7 +152,8 @@ download() {
       >&2 printf 'Output already exists: %s\n' "$output"
     else
       >&2 printf 'Downloading %s\n' "$output"
-      if curl -sL \
+      if curl -L \
+          ${SILENT_CURL:+'--silent'} \
           -A "$UserAgent" \
           -H "License: $(cat "$license_path")" \
           -H "ClientID: $ClientID" \
@@ -171,7 +174,8 @@ download() {
   if [[ -n "$CoverUrl" ]]; then
       cover_output=$dir/folder.jpg
       >&2 printf 'Downloading %s\n' "$cover_output"
-      if curl -sL \
+      if curl -L \
+          ${SILENT_CURL:+'--silent'} \
           -A "$UserAgent" \
           --compressed -o "$cover_output" \
           "$CoverUrl"; then
