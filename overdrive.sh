@@ -79,7 +79,7 @@ acquire_license() {
     Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
     >&2 printf 'Using Hash=%s\n' "$Hash"
 
-    curl -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
+    curl -s -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
   fi
 }
 
@@ -171,7 +171,7 @@ download() {
   if [[ -n "$CoverUrl" ]]; then
       cover_output=$dir/folder.jpg
       >&2 printf 'Downloading %s\n' "$cover_output"
-      if curl -L \
+      if curl -sL \
           -A "$UserAgent" \
           --compressed -o "$cover_output" \
           "$CoverUrl"; then
