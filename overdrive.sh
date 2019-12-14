@@ -67,10 +67,10 @@ acquire_license() {
     >&2 printf 'Generating random ClientID=%s\n' "$ClientID"
 
     # first extract the "AcquisitionUrl"
-    AcquisitionUrl=$(xmlstarlet sel -t -v '/OverDriveMedia/License/AcquisitionUrl' "$1")
+    AcquisitionUrl=$(xmllint --xpath '/OverDriveMedia/License/AcquisitionUrl/text()' "$1")
     >&2 printf 'Using AcquisitionUrl=%s\n' "$AcquisitionUrl"
 
-    MediaID=$(xmlstarlet sel -t -v '/OverDriveMedia/@id' "$1")
+    MediaID=$(xmllint --xpath 'string(/OverDriveMedia/@id)' "$1")
     >&2 printf 'Using MediaID=%s\n' "$MediaID"
 
     # Compute the Hash value; thanks to https://github.com/jvolkening/gloc/blob/v0.601/gloc#L1523-L1531
@@ -89,31 +89,40 @@ extract_metadata() {
   # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
   # luckily, it's the only text content at that level
   # N.b.: tidy will still write errors & warnings to /dev/stderr, despite the -quiet
-  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1" | tidy -xml -wrap 0 -quiet
+  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1" \
+  | tidy -xml -wrap 0 -quiet
 }
 
 extract_author() {
   # Usage: extract_author book.odm
   # Most Creator/@role values for authors are simply "Author" but some are "Author and narrator"
-  extract_metadata "$1" | xmlstarlet sel -t -v "//Creator[starts-with(@role, 'Author')][position()<=3]/text()" | tr '\n' + | sed 's/+/, /g'
+  extract_metadata "$1" \
+  | xmlstarlet sel -t -v "//Creator[starts-with(@role, 'Author')][position()<=3]/text()" \
+  | tr '\n' + | sed 's/+/, /g'
 }
 
 extract_title() {
   # Usage: extract_title book.odm
-  extract_metadata "$1" | xmlstarlet sel -t -v '//Title' | tr -Cs '[:alnum:] ._-' -
+  extract_metadata "$1" \
+  | xmllint --xpath '//Title/text()' - \
+  | tr -Cs '[:alnum:] ._-' -
 }
 
 extract_duration() {
   # Usage: extract_duration book.odm
 
-  # awk -F : '{print $1*60 + $2}' # converts MM:SS into just seconds
-  # awk '{sum += $1} END {print sum}' # sums (first column of) input
-  xmlstarlet sel -t -v '//Part/@duration' -n "$1" | awk -F : '{print $1*60 + $2}' | awk '{sum += $1} END {print sum}'
+  # awk: `-F :` split on colons; for MM:SS, MM=>$1, SS=>$2
+  #      `$1*60 + $2` converts MM:SS into seconds
+  #      `{sum += ...} END {print sum}` output total sum (seconds)
+  xmlstarlet sel -t -v '//Part/@duration' -n "$1" \
+  | awk -F : '{sum += $1*60 + $2} END {print sum}'
 }
 
 extract_coverUrl() {
   # Usage: extract_coverUrl book.odm
-  extract_metadata "$1" | xmlstarlet sel -t -v '//CoverUrl' | sed -e "s/{/%7B/" -e "s/}/%7D/"
+  extract_metadata "$1" \
+  | xmllint --xpath '//CoverUrl/text()' - \
+  | sed -e "s/{/%7B/" -e "s/}/%7D/"
 }
 
 download() {
@@ -125,8 +134,8 @@ download() {
   acquire_license "$1" "$license_path"
   >&2 printf 'Using License=%s\n' "$(cat "$license_path")"
 
-  # the license XML specifies a default namespace, which the XPath expression must also reference
-  ClientID=$(xmlstarlet sel -N ol=http://license.overdrive.com/2008/03/License.xsd -t -v '/ol:License/ol:SignedInfo/ol:ClientID' "$license_path")
+  # the license XML specifies a default namespace, so the XPath is a bit awkward
+  ClientID=$(xmllint --xpath '//*[local-name()="ClientID"]/text()' "$license_path")
   >&2 printf 'Using ClientID=%s from License\n' "$ClientID"
 
   # extract the author and title
@@ -136,7 +145,7 @@ download() {
   >&2 printf 'Using Title=%s\n' "$Title"
 
   # prepare to download the parts
-  baseurl=$(xmlstarlet sel -t -v '//Protocol[@method="download"]/@baseurl' "$1")
+  baseurl=$(xmllint --xpath 'string(//Protocol[@method="download"]/@baseurl)' "$1")
 
   dir="$Author - $Title"
   >&2 printf 'Creating directory %s\n' "$dir"
@@ -193,7 +202,7 @@ early_return() {
   # return is a bash keyword, so we can't use that as the name of the function :(
 
   # Read the EarlyReturnURL tag from the input odm file
-  EarlyReturnURL=$(xmlstarlet sel -t -v '/OverDriveMedia/EarlyReturnURL' "$1")
+  EarlyReturnURL=$(xmllint --xpath '/OverDriveMedia/EarlyReturnURL/text()' "$1")
   >&2 printf 'Using EarlyReturnURL=%s\n' "$EarlyReturnURL"
 
   curl -A "$UserAgentLong" "$EarlyReturnURL"
@@ -213,7 +222,9 @@ info() {
 
 metadata() {
   # Usage: metadata book.odm
-  extract_metadata "$1" | xmlstarlet fo --omit-decl
+  extract_metadata "$1" \
+  | xmllint --format - \
+  | sed 1d
 }
 
 # now actually loop over the media files and commands
