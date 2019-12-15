@@ -54,6 +54,19 @@ if [[ ${#MEDIA[@]} -eq 0 || ${#COMMANDS[@]} -eq 0 ]]; then
   exit 1
 fi
 
+_xmllint_iter_xpath() {
+  # Usage: _xmllint_iter_xpath /xpath/to/list file.xml [/path/to/value]
+  #
+  # Iterate over each XPath match, separated by newlines.
+  count=$(xmllint --xpath "count($1)" "$2")
+  for i in $(seq 1 "$count"); do
+    if [[ $i != 1 ]]; then
+      printf '\n'
+    fi
+    xmllint --xpath "string($1[position()=$i]$3)" "$2"
+  done
+}
+
 acquire_license() {
   # Usage: acquire_license book.odm book.license
   #
@@ -84,52 +97,59 @@ acquire_license() {
 }
 
 extract_metadata() {
-  # Usage: extract_metadata book.odm
+  # Usage: extract_metadata book.odm book.metadata
   #
-  # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
+  # The Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
   # luckily, it's the only text content at that level
+  # sed: delete CDATA prefix from beginning of first line, and suffix from end of last line
   # N.b.: tidy will still write errors & warnings to /dev/stderr, despite the -quiet
-  xmlstarlet sel -T text -t -v '/OverDriveMedia/text()' "$1" \
-  | tidy -xml -wrap 0 -quiet
+  if [[ -e $2 ]]; then
+    : # >&2 printf 'Metadata already extracted: %s\n' "$2"
+  else
+    xmllint --noblanks --xpath '/OverDriveMedia/text()' "$1" \
+    | sed -e '1s/^<!\[CDATA\[//' -e '$s/]]>$//' \
+    | tidy -xml -wrap 0 -quiet > "$metadata_path"
+  fi
 }
 
 extract_author() {
-  # Usage: extract_author book.odm
+  # Usage: extract_author book.odm.metadata
   # Most Creator/@role values for authors are simply "Author" but some are "Author and narrator"
-  extract_metadata "$1" \
-  | xmlstarlet sel -t -v "//Creator[starts-with(@role, 'Author')][position()<=3]/text()" \
+  _xmllint_iter_xpath "//Creator[starts-with(@role, 'Author')][position()<=3]" "$1" \
   | tr '\n' + | sed 's/+/, /g'
 }
 
 extract_title() {
-  # Usage: extract_title book.odm
-  extract_metadata "$1" \
-  | xmllint --xpath '//Title/text()' - \
+  # Usage: extract_title book.odm.metadata
+  xmllint --xpath '//Title/text()' "$1" \
   | tr -Cs '[:alnum:] ._-' -
 }
 
 extract_duration() {
   # Usage: extract_duration book.odm
-
+  #
   # awk: `-F :` split on colons; for MM:SS, MM=>$1, SS=>$2
   #      `$1*60 + $2` converts MM:SS into seconds
   #      `{sum += ...} END {print sum}` output total sum (seconds)
-  xmlstarlet sel -t -v '//Part/@duration' -n "$1" \
+  _xmllint_iter_xpath '//Part' "$1" '/@duration' \
   | awk -F : '{sum += $1*60 + $2} END {print sum}'
 }
 
+extract_filenames() {
+  # Usage: extract_filenames book.odm
+  _xmllint_iter_xpath '//Part' "$1" '/@filename' \
+  | sed -e "s/{/%7B/" -e "s/}/%7D/"
+}
+
 extract_coverUrl() {
-  # Usage: extract_coverUrl book.odm
-  extract_metadata "$1" \
-  | xmllint --xpath '//CoverUrl/text()' - \
+  # Usage: extract_coverUrl book.odm.metadata
+  xmllint --xpath '//CoverUrl/text()' "$1" \
   | sed -e "s/{/%7B/" -e "s/}/%7D/"
 }
 
 download() {
   # Usage: download book.odm
   #
-  # the Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
-  # luckily, it's the only text content at that level
   license_path=$1.license
   acquire_license "$1" "$license_path"
   >&2 printf 'Using License=%s\n' "$(cat "$license_path")"
@@ -138,10 +158,14 @@ download() {
   ClientID=$(xmllint --xpath '//*[local-name()="ClientID"]/text()' "$license_path")
   >&2 printf 'Using ClientID=%s from License\n' "$ClientID"
 
+  # extract metadata
+  metadata_path=$1.metadata
+  extract_metadata "$1" "$metadata_path"
+
   # extract the author and title
-  Author=$(extract_author "$1")
+  Author=$(extract_author "$metadata_path")
   >&2 printf 'Using Author=%s\n' "$Author"
-  Title=$(extract_title "$1")
+  Title=$(extract_title "$metadata_path")
   >&2 printf 'Using Title=%s\n' "$Title"
 
   # prepare to download the parts
@@ -173,9 +197,9 @@ download() {
         return $STATUS
       fi
     fi
-  done < <(xmlstarlet sel -t -v '//Part/@filename' -n "$1" | tr \\ / | sed -e "s/{/%7B/" -e "s/}/%7D/")
+  done < <(extract_filenames "$1")
 
-  CoverUrl=$(extract_coverUrl "$1")
+  CoverUrl=$(extract_coverUrl "$metadata_path")
   >&2 printf 'Using CoverUrl=%s\n' "$CoverUrl"
   if [[ -n "$CoverUrl" ]]; then
       cover_output=$dir/folder.jpg
@@ -217,14 +241,16 @@ info() {
     printf '%s\t%s\t%s\n' author title duration
     HEADER_PRINTED=1
   fi
-  printf '%s\t%s\t%d\n' "$(extract_author "$1")" "$(extract_title "$1")" "$(extract_duration "$1")"
+  metadata_path=$1.metadata
+  extract_metadata "$1" "$metadata_path"
+  printf '%s\t%s\t%d\n' "$(extract_author "$metadata_path")" "$(extract_title "$metadata_path")" "$(extract_duration "$1")"
 }
 
 metadata() {
   # Usage: metadata book.odm
-  extract_metadata "$1" \
-  | xmllint --format - \
-  | sed 1d
+  metadata_path=$1.metadata
+  extract_metadata "$1" "$metadata_path"
+  xmllint --format "$metadata_path" | sed 1d
 }
 
 # now actually loop over the media files and commands
