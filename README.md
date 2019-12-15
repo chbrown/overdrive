@@ -3,7 +3,7 @@
 OverDrive is great and distributes DRM-free MP3s instead of some fragile DRM-ridden format, which is awesome.
 Way to go, Rakuten / OverDrive, fight the man!
 
-Their "OverDrive Media Console" application on Mac OS X is pretty simple...
+Their "OverDrive Media Console" application for macOS is pretty simple...
 so simple, I'm like, why have an app?
 
 So I wrote a shell script, [`overdrive.sh`](overdrive.sh),
@@ -13,35 +13,35 @@ and downloads the audio content files locally, just like the app.
 
 ## Install
 
-The following will install the main script to your `/usr/local/bin` folder and mark it executable:
+The following will install the standalone script into `~/.local/bin` and mark it executable:
 
-    curl https://chbrown.github.io/overdrive/overdrive.sh > /usr/local/bin/overdrive
-    chmod +x /usr/local/bin/overdrive
+```sh
+mkdir -p ~/.local/bin
+curl https://chbrown.github.io/overdrive/overdrive.sh -o ~/.local/bin/overdrive
+chmod +x ~/.local/bin/overdrive
+```
 
-Assuming `/usr/local/bin` is on your `PATH`, you can now run `overdrive --help` to show all the options.
+At this point, if calling `overdrive` produces the error message `-bash: overdrive: command not found`,
+you'll need to add `~/.local/bin` to your `PATH`. One way to do this:
 
+```sh
+printf 'export PATH=$HOME/.local/bin:$PATH\n' >> ~/.bashrc
+source ~/.bashrc
+```
 
-## Prerequisites
-
-This script is tested (i.e., developed and used) on macOS with bash 4.4.
-It depends on the following (potentially non-standard?) executables being available on your `PATH`:
-
-* `curl`
-* `uuidgen`
-* `xmlstarlet`
-* `iconv`
-* `openssl`
-* `base64`
-* `tidy`
+Now you should be able to run `overdrive --help` and use the commands described below...
 
 
 ## Instructions
 
 Download an OverDrive loan file from your library or wherever.
 I'll assume that yours is called `Novel.odm`.
+Assuming you've downloaded it to your `~/Downloads` folder, simply run the following command:
 
-When you run `overdrive download Novel.odm`,
-the script first checks if there is already a `Novel.odm.license` file alongside `Novel.odm`.
+    cd ~/Downloads
+    overdrive download Novel.odm
+
+When you run that, the script first checks if there is already a `Novel.odm.license` file alongside `Novel.odm`.
 If that file already exists, the script will not request a new license,
 since the OverDrive server will only grant one license per `.odm` loan.
 If not, it will request the license from the OverDrive server and write it to a new `Novel.odm.license` file,
@@ -88,6 +88,20 @@ If that doesn't help you debug the problem,
 [open an issue](https://github.com/chbrown/overdrive/issues/new),
 including the full debug output (optimally as a [gist](https://gist.github.com/)),
 and I'll try to help you out.
+
+
+#### Prerequisites
+
+This script is tested (i.e., developed and used) on macOS with bash 5.0.
+It depends on the following executables being available on your `PATH`:
+
+* `curl`
+* `uuidgen`
+* `xmllint`
+* `iconv`
+* `openssl`
+* `base64`
+* `tidy`
 
 
 ## Post-processing
