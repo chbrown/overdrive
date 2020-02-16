@@ -29,6 +29,13 @@ printf 'export PATH=$HOME/.local/bin:$PATH\n' >> ~/.bashrc
 source ~/.bashrc
 ```
 
+**_N.b.:_ if you're using `zsh`** instead of `bash`, run this instead:
+
+```sh
+printf 'export PATH=$HOME/.local/bin:$PATH\n' >> ~/.zshrc
+source ~/.zshrc
+```
+
 Now you should be able to run `overdrive --help` and use the commands described below...
 
 
