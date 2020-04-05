@@ -60,10 +60,8 @@ _xmllint_iter_xpath() {
   # Iterate over each XPath match, separated by newlines.
   count=$(xmllint --xpath "count($1)" "$2")
   for i in $(seq 1 "$count"); do
-    if [[ $i != 1 ]]; then
-      printf '\n'
-    fi
     xmllint --xpath "string($1[position()=$i]$3)" "$2"
+    printf '\n'
   done
 }
 
@@ -116,7 +114,7 @@ extract_author() {
   # Usage: extract_author book.odm.metadata
   # Most Creator/@role values for authors are simply "Author" but some are "Author and narrator"
   _xmllint_iter_xpath "//Creator[starts-with(@role, 'Author')][position()<=3]" "$1" \
-  | tr '\n' + | sed 's/+/, /g'
+  | sed '$!s/$/, /' | tr -d '\n'
 }
 
 extract_title() {
