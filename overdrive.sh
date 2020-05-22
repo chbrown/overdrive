@@ -106,7 +106,7 @@ extract_metadata() {
   else
     xmllint --noblanks --xpath '/OverDriveMedia/text()' "$1" \
     | sed -e '1s/^<!\[CDATA\[//' -e '$s/]]>$//' \
-    | tidy -xml -wrap 0 -quiet > "$metadata_path"
+    | tidy -xml -wrap 0 -quiet > "$metadata_path" || true
   fi
 }
 
