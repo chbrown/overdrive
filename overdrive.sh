@@ -57,7 +57,7 @@ fi
 _xmllint_iter_xpath() {
   # Usage: _xmllint_iter_xpath /xpath/to/list file.xml [/path/to/value]
   #
-  # Iterate over each XPath match, separated by newlines.
+  # Iterate over each XPath match, adding a newline after each.
   count=$(xmllint --xpath "count($1)" "$2")
   for i in $(seq 1 "$count"); do
     xmllint --xpath "string($1[position()=$i]$3)" "$2"
