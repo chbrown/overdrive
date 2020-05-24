@@ -3,7 +3,7 @@
 set -e # exit immediately on first error
 
 # should match `git describe --tags` with clean working tree
-VERSION=1.0.1
+VERSION=2.0.0
 
 OMC=1.2.0
 OS=10.11.6
@@ -186,7 +186,7 @@ download() {
   while read -r path; do
     # delete from path up until the last hyphen to the get Part0N.mp3 suffix
     suffix=${path##*-}
-    output="$dir/$Title-$suffix"
+    output="$dir/$suffix"
     if [[ -e $output ]]; then
       >&2 printf 'Output already exists: %s\n' "$output"
     else
