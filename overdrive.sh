@@ -6,7 +6,6 @@ OMC=1.2.0
 OS=10.11.6
 # use same user agent as mobile app
 UserAgent='OverDrive Media Console'
-UserAgentLong='OverDrive Media Console/3.7.0.28 iOS/10.3.3'
 
 usage() {
   >&2 cat <<HELP
@@ -22,6 +21,7 @@ HELP
 
 MEDIA=()
 COMMANDS=()
+CURLOPTS=(-s -L -A "$UserAgent" --compressed)
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
@@ -90,7 +90,7 @@ acquire_license() {
     Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
     >&2 printf 'Using Hash=%s\n' "$Hash"
 
-    curl -s -A "$UserAgent" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
+    curl "${CURLOPTS[@]}" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
   fi
 }
 
@@ -181,11 +181,10 @@ download() {
       >&2 printf 'Output already exists: %s\n' "$output"
     else
       >&2 printf 'Downloading %s\n' "$output"
-      if curl -sL \
-          -A "$UserAgent" \
+      if curl "${CURLOPTS[@]}" \
           -H "License: $(cat "$license_path")" \
           -H "ClientID: $ClientID" \
-          --compressed -o "$output" \
+          -o "$output" \
           "$baseurl/$path"; then
         >&2 printf 'Downloaded %s successfully\n' "$output"
       else
@@ -202,9 +201,8 @@ download() {
   if [[ -n "$CoverUrl" ]]; then
       cover_output=$dir/folder.jpg
       >&2 printf 'Downloading %s\n' "$cover_output"
-      if curl -sL \
-          -A "$UserAgent" \
-          --compressed -o "$cover_output" \
+      if curl "${CURLOPTS[@]}" \
+          -o "$cover_output" \
           "$CoverUrl"; then
         >&2 printf 'Downloaded cover image successfully\n'
       else
@@ -227,7 +225,7 @@ early_return() {
   EarlyReturnURL=$(xmllint --xpath '/OverDriveMedia/EarlyReturnURL/text()' "$1")
   >&2 printf 'Using EarlyReturnURL=%s\n' "$EarlyReturnURL"
 
-  curl -A "$UserAgentLong" "$EarlyReturnURL"
+  curl "${CURLOPTS[@]}" "$EarlyReturnURL"
   # that response doesn't have a newline, so one more superfluous log to clean up:
   >&2 printf '\nFinished returning book\n'
 }
