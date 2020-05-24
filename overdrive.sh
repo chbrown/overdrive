@@ -2,6 +2,9 @@
 
 set -e # exit immediately on first error
 
+# should match `git describe --tags` with clean working tree
+VERSION=1.0.1
+
 OMC=1.2.0
 OS=10.11.6
 # use same user agent as mobile app
@@ -9,7 +12,9 @@ UserAgent='OverDrive Media Console'
 
 usage() {
   >&2 cat <<HELP
-Usage: $(basename "$0") command [command2 ...] book.odm [book2.odm ...] [-h|--help] [-v|--verbose]
+Usage: $(basename "$0") [-h|--help]
+       $(basename "$0") --version
+       $(basename "$0") command [command2 ...] book.odm [book2.odm ...] [-v|--verbose]
 
 Commands:
   download   Download the mp3s for an OverDrive book loan.
@@ -26,6 +31,10 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
       usage
+      exit 0
+      ;;
+    --version)
+      >&2 printf '%s\n' "$VERSION"
       exit 0
       ;;
     -v|--verbose)
