@@ -29,8 +29,9 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     -v|--verbose)
-      set -x
       >&2 printf 'Entering debug (verbose) mode\n'
+      set -x
+      CURLOPTS=("${CURLOPTS[@]:1}") # slice off the '-s'
       ;;
     *.odm)
       MEDIA+=("$1")
