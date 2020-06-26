@@ -126,6 +126,24 @@ Unfortunately, it appears that iTunes always loads `.mp3`s as "Music" despite th
 you have to open iTunes, "Get Info" for the intended songs, and set the "Media Kind" to "Audiobook" manually.
 
 
+## Docker
+
+To use Docker, clone the repo and run:
+
+```
+docker build -t overdrive .
+docker run -v $(pwd):/data overdrive
+```
+
+The container runs with UID:GID of 1000:1000 by default. To change it, add the --user option:
+
+`docker run --rm -v $(pwd):/data --user 999:999 overdrive`
+
+The command is quite cumbersome. You may want to set an alias in .bashrc or similar:
+
+`alias overdrive='docker run --rm -v $(pwd):/data --user 999:999 overdrive'`
+
+
 ## License
 
 Copyright © 2017–2020 Christopher Brown.
