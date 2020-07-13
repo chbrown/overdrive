@@ -69,7 +69,7 @@ Now, license in hand, the script downloads the audio content files by taking the
 4. Extract the `Title` and `Author` values from the `CDATA` content nested in `Novel.odm`.
 5. For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint,
    which will validate the request and redirect to the actual MP3 file on their CDN,
-   and save the result into a folder in the current directory, named like `Author - Title/Title-Part0N.mp3`.
+   and save the result into a folder in the current directory, named like `Author - Title/Part0N.mp3`.
 
 
 ### Returning
