@@ -97,6 +97,13 @@ including the full debug output (optimally as a [gist](https://gist.github.com/)
 and I'll try to help you out.
 
 
+#### F.A.Q.
+
+- Q: I got an error message like `-bash: ~/.local/bin/overdrive: Permission denied` or `zsh: permission denied: overdrive`; what's wrong? \
+  A: You installed `overdrive` to the right place 👍, but didn't set the executable flag 😟.
+     Try running the `chmod +x` command from the [Install](#install) steps again.
+
+
 #### Prerequisites
 
 This script is tested (i.e., developed and used) on macOS with bash 5.0.
