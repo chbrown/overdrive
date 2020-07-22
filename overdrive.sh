@@ -3,7 +3,7 @@
 set -e # exit immediately on first error
 
 # should match `git describe --tags` with clean working tree
-VERSION=2.0.0
+VERSION=2.0.1
 
 OMC=1.2.0
 OS=10.11.6
@@ -63,6 +63,13 @@ if [[ ${#MEDIA[@]} -eq 0 || ${#COMMANDS[@]} -eq 0 ]]; then
   [[ ${#MEDIA[@]} -eq 0 ]] && >&2 printf 'You must supply at least one media file (the .odm extension is required).\n'
   exit 1
 fi
+
+_sanitize() {
+  # Usage: printf 'Hello, world!\n' | _sanitize
+  #
+  # Replace filename-unfriendly characters with a hyphen and trim leading/trailing hyphens/spaces
+  tr -Cs '[:alnum:] ._-' - | sed -e 's/^[- ]*//' -e 's/[- ]*$//'
+}
 
 _xmllint_iter_xpath() {
   # Usage: _xmllint_iter_xpath /xpath/to/list file.xml [/path/to/value]
@@ -130,7 +137,7 @@ extract_author() {
 extract_title() {
   # Usage: extract_title book.odm.metadata
   xmllint --xpath '//Title/text()' "$1" \
-  | tr -Cs '[:alnum:] ._-' -
+  | _sanitize
 }
 
 extract_duration() {
