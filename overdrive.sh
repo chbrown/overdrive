@@ -3,7 +3,7 @@
 set -e # exit immediately on first error
 
 # should match `git describe --tags` with clean working tree
-VERSION=2.0.1
+VERSION=2.1.0
 
 OMC=1.2.0
 OS=10.11.6
@@ -130,8 +130,7 @@ extract_metadata() {
 extract_author() {
   # Usage: extract_author book.odm.metadata
   # Most Creator/@role values for authors are simply "Author" but some are "Author and narrator"
-  _xmllint_iter_xpath "//Creator[starts-with(@role, 'Author')][position()<=3]" "$1" \
-  | sed '$!s/$/, /' | tr -d '\n'
+  xmllint --xpath "string(//Creator[starts-with(@role, 'Author')])" "$1"
 }
 
 extract_title() {
