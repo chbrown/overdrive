@@ -3,7 +3,7 @@
 set -e # exit immediately on first error
 
 # should match `git describe --tags` with clean working tree
-VERSION=2.1.0
+VERSION=2.1.1
 
 OMC=1.2.0
 OS=10.11.6
@@ -74,11 +74,12 @@ _sanitize() {
 _xmllint_iter_xpath() {
   # Usage: _xmllint_iter_xpath /xpath/to/list file.xml [/path/to/value]
   #
-  # Iterate over each XPath match, adding a newline after each.
+  # Iterate over each XPath match, ensuring each ends with exactly one newline.
   count=$(xmllint --xpath "count($1)" "$2")
   for i in $(seq 1 "$count"); do
-    xmllint --xpath "string($1[position()=$i]$3)" "$2"
-    printf '\n'
+    # xmllint does not reliably emit newlines, so we use command substitution to
+    # trim trailing newlines, if there are any, and printf to add exactly one.
+    printf '%s\n' "$(xmllint --xpath "string($1[position()=$i]$3)" "$2")"
   done
 }
 
