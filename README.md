@@ -119,6 +119,18 @@ It depends on the following executables being available on your `PATH`:
 * `base64`
 * `tidy`
 
+Package manager one-liners
+(_please create a [PR](https://github.com/chbrown/overdrive/pulls) to contribute a new OS!_):
+
+| Command | OS |
+|:--------|:---|
+| `brew install openssl tidy-html5` | # macOS<sup>†</sup>
+| `apt-get install curl uuid-runtime libxml2-utils libc-bin openssl coreutils tidy` | # Debian / Ubuntu
+| `apk add bash curl util-linux libxml2-utils openssl tidyhtml` | # Alpine
+| `pacman -S curl util-linux libxml2 openssl coreutils tidy` | # Arch
+
+<sup>†</sup>Though this is unnecessary; AFAICT, all required commands are installed by default on macOS 10.14 (Mojave).
+
 
 ## Post-processing
 
