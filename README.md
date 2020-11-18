@@ -128,6 +128,7 @@ Package manager one-liners
 | `apt-get install curl uuid-runtime libxml2-utils libc-bin openssl coreutils tidy` | # Debian / Ubuntu
 | `apk add bash curl util-linux libxml2-utils openssl tidyhtml` | # Alpine
 | `pacman -S curl util-linux libxml2 openssl coreutils tidy` | # Arch
+| `dnf install curl glibc-common util-linux libxml2 openssl coreutils tidy` | # Fedora
 
 <sup>†</sup>Though this is unnecessary; AFAICT, all required commands are installed by default on macOS 10.14 (Mojave).
 
