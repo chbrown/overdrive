@@ -3,7 +3,7 @@
 set -e # exit immediately on first error
 
 # should match `git describe --tags` with clean working tree
-VERSION=2.1.1
+VERSION=2.2.0
 
 OMC=1.2.0
 OS=10.11.6
@@ -17,10 +17,11 @@ Usage: $(basename "$0") [-h|--help]
        $(basename "$0") command [command2 ...] book.odm [book2.odm ...] [-v|--verbose]
 
 Commands:
-  download   Download the mp3s for an OverDrive book loan.
-  return     Process an early return for an OverDrive book loan.
-  info       Print the author, title, and total duration (in seconds) for each OverDrive loan file.
-  metadata   Print all metadata from each OverDrive loan file.
+  download   	Download the mp3s for an OverDrive book loan.
+  return     	Process an early return for an OverDrive book loan.
+  info       	Print the author, title, and total duration (in seconds) for each OverDrive loan file.
+  metadata   	Print all metadata from each OverDrive loan file.
+  quicknclean	Download the mp3s for an OverDrive book loan, process an early return for an OverDrive book loan, and delete all .odm files.
 HELP
 }
 
@@ -45,7 +46,7 @@ while [[ $# -gt 0 ]]; do
     *.odm)
       MEDIA+=("$1")
       ;;
-    download|return|info|metadata)
+    download|return|info|metadata|quicknclean)
       COMMANDS+=("$1")
       ;;
     *)
@@ -164,7 +165,6 @@ extract_coverUrl() {
 
 download() {
   # Usage: download book.odm
-  #
   license_path=$1.license
   acquire_license "$1" "$license_path"
   >&2 printf 'Using License=%s\n' "$(cat "$license_path")"
@@ -216,7 +216,7 @@ download() {
   CoverUrl=$(extract_coverUrl "$metadata_path")
   >&2 printf 'Using CoverUrl=%s\n' "$CoverUrl"
   if [[ -n "$CoverUrl" ]]; then
-      cover_output=$dir/folder.jpg
+      cover_output=$dir/cover.jpg
       >&2 printf 'Downloading %s\n' "$cover_output"
       if curl "${CURLOPTS[@]}" \
           -o "$cover_output" \
@@ -245,6 +245,14 @@ early_return() {
   curl "${CURLOPTS[@]}" "$EarlyReturnURL"
   # that response doesn't have a newline, so one more superfluous log to clean up:
   >&2 printf '\nFinished returning book\n'
+}
+
+quicknclean() {
+	# Usage: download book.odm, early_return book.odm, delete book.odm.metadata, delete book.odm.license, delete book.odm
+	download "$1"
+	early_return "$1"
+	rm "$1.metadata" "$1.license" "$1"
+	>&2 printf 'Finished deleting files\n'
 }
 
 HEADER_PRINTED=
@@ -281,6 +289,9 @@ for ODM in "${MEDIA[@]}"; do
         ;;
       metadata)
         metadata "$ODM"
+        ;;
+      quicknclean)
+        quicknclean "$ODM"
         ;;
       *)
         >&2 printf 'Unrecognized command: %s\n' "$COMMAND"
