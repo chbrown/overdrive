@@ -117,14 +117,76 @@ extract_metadata() {
   #
   # The Metadata XML is nested as CDATA inside the the root OverDriveMedia element;
   # luckily, it's the only text content at that level
-  # sed: delete CDATA prefix from beginning of first line, and suffix from end of last line
-  # N.b.: tidy will still write errors & warnings to /dev/stderr, despite the -quiet
+  # sed: delete CDATA prefix from beginning of first line and suffix from end of last line,
+  # replace unescaped & characters with &amp; entities,
+  # and convert a selection of named HTML entities to their decimal code points
   if [[ -e $2 ]]; then
     : # >&2 printf 'Metadata already extracted: %s\n' "$2"
   else
     xmllint --noblanks --xpath '/OverDriveMedia/text()' "$1" \
     | sed -e '1s/^<!\[CDATA\[//' -e '$s/]]>$//' \
-    | tidy -xml -wrap 0 -quiet > "$metadata_path" || true
+          -e 's/ & / \&amp; /g' \
+          -e 's/&nbsp;/\&#160;/g' \
+          -e 's/&iexcl;/\&#161;/g' \
+          -e 's/&cent;/\&#162;/g' \
+          -e 's/&pound;/\&#163;/g' \
+          -e 's/&yen;/\&#165;/g' \
+          -e 's/&sect;/\&#167;/g' \
+          -e 's/&copy;/\&#169;/g' \
+          -e 's/&ordf;/\&#170;/g' \
+          -e 's/&laquo;/\&#171;/g' \
+          -e 's/&reg;/\&#174;/g' \
+          -e 's/&deg;/\&#176;/g' \
+          -e 's/&sup2;/\&#178;/g' \
+          -e 's/&sup3;/\&#179;/g' \
+          -e 's/&para;/\&#182;/g' \
+          -e 's/&ordm;/\&#186;/g' \
+          -e 's/&raquo;/\&#187;/g' \
+          -e 's/&iquest;/\&#191;/g' \
+          -e 's/&Agrave;/\&#192;/g' \
+          -e 's/&Aacute;/\&#193;/g' \
+          -e 's/&Aring;/\&#197;/g' \
+          -e 's/&AElig;/\&#198;/g' \
+          -e 's/&Ccedil;/\&#199;/g' \
+          -e 's/&Egrave;/\&#200;/g' \
+          -e 's/&Eacute;/\&#201;/g' \
+          -e 's/&Igrave;/\&#204;/g' \
+          -e 's/&Iacute;/\&#205;/g' \
+          -e 's/&Ograve;/\&#210;/g' \
+          -e 's/&Oacute;/\&#211;/g' \
+          -e 's/&Ouml;/\&#214;/g' \
+          -e 's/&times;/\&#215;/g' \
+          -e 's/&Oslash;/\&#216;/g' \
+          -e 's/&Ugrave;/\&#217;/g' \
+          -e 's/&Uacute;/\&#218;/g' \
+          -e 's/&Uuml;/\&#220;/g' \
+          -e 's/&Yacute;/\&#221;/g' \
+          -e 's/&agrave;/\&#224;/g' \
+          -e 's/&aacute;/\&#225;/g' \
+          -e 's/&egrave;/\&#232;/g' \
+          -e 's/&eacute;/\&#233;/g' \
+          -e 's/&igrave;/\&#236;/g' \
+          -e 's/&iacute;/\&#237;/g' \
+          -e 's/&ograve;/\&#242;/g' \
+          -e 's/&oacute;/\&#243;/g' \
+          -e 's/&ouml;/\&#246;/g' \
+          -e 's/&ugrave;/\&#249;/g' \
+          -e 's/&uacute;/\&#250;/g' \
+          -e 's/&uuml;/\&#252;/g' \
+          -e 's/&yacute;/\&#253;/g' \
+          -e 's/&thorn;/\&#254;/g' \
+          -e 's/&Scaron;/\&#352;/g' \
+          -e 's/&scaron;/\&#353;/g' \
+          -e 's/&ndash;/\&#8211;/g' \
+          -e 's/&mdash;/\&#8212;/g' \
+          -e 's/&lsquo;/\&#8216;/g' \
+          -e 's/&rsquo;/\&#8217;/g' \
+          -e 's/&ldquo;/\&#8220;/g' \
+          -e 's/&rdquo;/\&#8221;/g' \
+          -e 's/&bull;/\&#8226;/g' \
+          -e 's/&hellip;/\&#8230;/g' \
+          -e 's/&euro;/\&#8364;/g' \
+    > "$2"
   fi
 }
 
