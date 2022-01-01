@@ -109,7 +109,8 @@ acquire_license() {
     Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
     >&2 printf 'Using Hash=%s\n' "$Hash"
 
-    curl "${CURLOPTS[@]}" "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash" > "$2"
+    curl "${CURLOPTS[@]}" --fail -o "$2" \
+      "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash"
   fi
 }
 
