@@ -89,7 +89,7 @@ acquire_license() {
   #
   # Read the license signature from book.license if it exists; if it doesn't,
   # acquire a license from the OverDrive server and write it to book.license.
-  if [[ -e $2 ]]; then
+  if [[ -s $2 ]]; then
     >&2 printf 'License already acquired: %s\n' "$2"
   else
     # generate random Client ID
@@ -122,7 +122,7 @@ extract_metadata() {
   # sed: delete CDATA prefix from beginning of first line and suffix from end of last line,
   # replace unescaped & characters with &amp; entities,
   # and convert a selection of named HTML entities to their decimal code points
-  if [[ -e $2 ]]; then
+  if [[ -s $2 ]]; then
     : # >&2 printf 'Metadata already extracted: %s\n' "$2"
   else
     xmllint --noblanks --xpath '/OverDriveMedia/text()' "$1" \
