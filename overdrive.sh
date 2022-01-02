@@ -65,6 +65,15 @@ if [[ ${#MEDIA[@]} -eq 0 || ${#COMMANDS[@]} -eq 0 ]]; then
   exit 1
 fi
 
+for PREREQ in curl uuidgen xmllint iconv openssl base64; do
+  if ! command -v $PREREQ >/dev/null 2>&1; then
+    >&2 printf 'Cannot locate required executable "%s". ' $PREREQ
+    >&2 printf 'This will likely result in an error later on, '
+    >&2 printf 'which might leave you in an inconsistent failure state, '
+    >&2 printf 'but continuing anyway.\n'
+  fi
+done
+
 _sanitize() {
   # Usage: printf 'Hello, world!\n' | _sanitize
   #
