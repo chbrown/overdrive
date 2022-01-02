@@ -105,6 +105,10 @@ and I'll try to help you out.
   A: You installed `overdrive` to the right place 👍, but didn't set the executable flag 😟.
      Try running the `chmod +x` command from the [Install](#install) steps again.
 
+- Q: The script fails right after a `curl` call and then I reran it with `--verbose` and got an error message like `curl: (60) SSL certificate problem: certificate has expired`. \
+  A: The remote servers cannot be verified with your system's certificate authority.
+     You can bypass the security check by adding `--insecure` when calling `overdrive`.
+
 
 #### Prerequisites
 
