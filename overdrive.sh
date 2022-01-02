@@ -44,6 +44,10 @@ while [[ $# -gt 0 ]]; do
       CURLOPTS=("${CURLOPTS[@]:1}") # slice off the '-s'
       ;;
     *.odm)
+      if [[ ! -e $1 ]]; then
+        >&2 printf 'Specified media file does not exist: %s\n' "$1"
+        exit 2 # ENOENT 2 No such file or directory
+      fi
       MEDIA+=("$1")
       ;;
     download|return|info|metadata)
