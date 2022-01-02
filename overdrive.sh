@@ -43,6 +43,9 @@ while [[ $# -gt 0 ]]; do
       set -x
       CURLOPTS=("${CURLOPTS[@]:1}") # slice off the '-s'
       ;;
+    --insecure)
+      CURLOPTS+=("$1")
+      ;;
     *.odm)
       if [[ ! -e $1 ]]; then
         >&2 printf 'Specified media file does not exist: %s\n' "$1"
