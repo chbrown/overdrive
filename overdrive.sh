@@ -105,26 +105,36 @@ acquire_license() {
   #
   # Read the license signature from book.license if it exists; if it doesn't,
   # acquire a license from the OverDrive server and write it to book.license.
+  # We store the license in a file because OverDrive will only grant one license per `.odm` file,
+  # so that if something goes wrong later on, like your internet cuts out mid-download,
+  # it's easy to resume/recover where you left off.
   if [[ -s $2 ]]; then
     >&2 printf 'License already acquired: %s\n' "$2"
   else
-    # generate random Client ID
+    # generate random Client (GU)ID
     ClientID=$(uuidgen | tr '[:lower:]' '[:upper:]')
     >&2 printf 'Generating random ClientID=%s\n' "$ClientID"
 
     # first extract the "AcquisitionUrl"
     AcquisitionUrl=$(xmllint --xpath '/OverDriveMedia/License/AcquisitionUrl/text()' "$1")
     >&2 printf 'Using AcquisitionUrl=%s\n' "$AcquisitionUrl"
-
+    # along with the only other important (for getting the license) field, "MediaID"
     MediaID=$(xmllint --xpath 'string(/OverDriveMedia/@id)' "$1")
     >&2 printf 'Using MediaID=%s\n' "$MediaID"
 
-    # Compute the Hash value; thanks to https://github.com/jvolkening/gloc/blob/v0.601/gloc#L1523-L1531
+    # Compute the Base64-encoded SHA-1 hash from a few `|`-separated values
+    # and a suffix of `OVERDRIVE*MEDIA*CONSOLE`, but backwards.
+    # Thanks to https://github.com/jvolkening/gloc/blob/v0.601/gloc#L1523-L1531
+    # for somehow figuring out how to construct that hash!
     RawHash="$ClientID|$OMC|$OS|ELOSNOC*AIDEM*EVIRDREVO"
     >&2 printf 'Using RawHash=%s\n' "$RawHash"
     Hash=$(echo -n "$RawHash" | iconv -f ASCII -t UTF-16LE | openssl dgst -binary -sha1 | base64)
     >&2 printf 'Using Hash=%s\n' "$Hash"
 
+    # Submit a request to the OverDrive server to get the full license for this book,
+    # which is a small XML file with a root element <License>,
+    # which contains a long Base64-encoded <Signature>,
+    # which is subsequently used to retrieve the content files.
     curl "${CURLOPTS[@]}" --fail -o "$2" \
       "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash"
   fi
@@ -257,7 +267,7 @@ download() {
   metadata_path=$1.metadata
   extract_metadata "$1" "$metadata_path"
 
-  # extract the author and title
+  # extract the author and title from the metadata
   Author=$(extract_author "$metadata_path")
   >&2 printf 'Using Author=%s\n' "$Author"
   Title=$(extract_title "$metadata_path")
@@ -270,6 +280,9 @@ download() {
   >&2 printf 'Creating directory %s\n' "$dir"
   mkdir -p "$dir"
 
+  # For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint,
+  # which will validate the request and redirect to the actual MP3 file on their CDN,
+  # and save the result into a folder in the current directory, named like `Author - Title/Part0N.mp3`.
   while read -r path; do
     # delete from path up until the last hyphen to the get Part0N.mp3 suffix
     suffix=${path##*-}
@@ -322,6 +335,7 @@ early_return() {
   EarlyReturnURL=$(xmllint --xpath '/OverDriveMedia/EarlyReturnURL/text()' "$1")
   >&2 printf 'Using EarlyReturnURL=%s\n' "$EarlyReturnURL"
 
+  # now all we have to do is hit that URL
   curl "${CURLOPTS[@]}" "$EarlyReturnURL"
   # that response doesn't have a newline, so one more superfluous log to clean up:
   >&2 printf '\nFinished returning book\n'
