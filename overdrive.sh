@@ -93,11 +93,13 @@ _xmllint_iter_xpath() {
   #
   # Iterate over each XPath match, ensuring each ends with exactly one newline.
   count=$(xmllint --xpath "count($1)" "$2")
-  for i in $(seq 1 "$count"); do
-    # xmllint does not reliably emit newlines, so we use command substitution to
-    # trim trailing newlines, if there are any, and printf to add exactly one.
-    printf '%s\n' "$(xmllint --xpath "string($1[position()=$i]$3)" "$2")"
-  done
+  if [[ $count -gt 0 ]]; then
+    for i in $(seq 1 "$count"); do
+      # xmllint does not reliably emit newlines, so we use command substitution to
+      # trim trailing newlines, if there are any, and printf to add exactly one.
+      printf '%s\n' "$(xmllint --xpath "string($1[position()=$i]$3)" "$2")"
+    done
+  fi
 }
 
 acquire_license() {
@@ -248,7 +250,7 @@ extract_filenames() {
 
 extract_coverUrl() {
   # Usage: extract_coverUrl book.odm.metadata
-  xmllint --xpath '//CoverUrl/text()' "$1" \
+  _xmllint_iter_xpath '//CoverUrl' "$1" '/text()' \
   | sed -e "s/{/%7B/" -e "s/}/%7D/"
 }
 
@@ -306,24 +308,26 @@ download() {
     fi
   done < <(extract_filenames "$1")
 
-  CoverUrl=$(extract_coverUrl "$metadata_path")
-  >&2 printf 'Using CoverUrl=%s\n' "$CoverUrl"
-  if [[ -n "$CoverUrl" ]]; then
-      cover_output=$dir/folder.jpg
-      >&2 printf 'Downloading %s\n' "$cover_output"
-      if curl "${CURLOPTS[@]}" \
-          -o "$cover_output" \
-          "$CoverUrl"; then
-        >&2 printf 'Downloaded cover image successfully\n'
-      else
-        STATUS=$?
-        >&2 printf 'Failed trying to download cover image\n'
-        rm -f "$cover_output"
-        return $STATUS
-      fi
-  else
-    >&2 printf 'Cover image not available\n'
-  fi
+  # Loop over CoverUrl(s), since there may be none
+  while read -r CoverUrl; do
+    >&2 printf 'Using CoverUrl=%s\n' "$CoverUrl"
+    if [[ -n "$CoverUrl" ]]; then
+        cover_output=$dir/folder.jpg
+        >&2 printf 'Downloading %s\n' "$cover_output"
+        if curl "${CURLOPTS[@]}" \
+            -o "$cover_output" \
+            "$CoverUrl"; then
+          >&2 printf 'Downloaded cover image successfully\n'
+        else
+          STATUS=$?
+          >&2 printf 'Failed trying to download cover image\n'
+          rm -f "$cover_output"
+          return $STATUS
+        fi
+    else
+      >&2 printf 'Cover image not available\n'
+    fi
+  done < <(extract_coverUrl "$metadata_path" | head -1)
 }
 
 early_return() {
