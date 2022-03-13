@@ -137,8 +137,15 @@ acquire_license() {
     # which is a small XML file with a root element <License>,
     # which contains a long Base64-encoded <Signature>,
     # which is subsequently used to retrieve the content files.
-    curl "${CURLOPTS[@]}" --fail -o "$2" \
-      "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash"
+    http_code=$(curl "${CURLOPTS[@]}" -o "$2" -w '%{http_code}' \
+      "$AcquisitionUrl?MediaID=$MediaID&ClientID=$ClientID&OMC=$OMC&OS=$OS&Hash=$Hash")
+    # if server responded with something besides an HTTP 200 OK (or other 2** success code),
+    # print the failure response to stderr and delete the (invalid) file
+    if [[ $http_code != 2?? ]]; then
+      >&2 cat "$2"
+      rm "$2"
+      exit 22  # curl's exit code for "HTTP page not retrieved"
+    fi
   fi
 }
 
