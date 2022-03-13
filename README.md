@@ -102,6 +102,10 @@ by editing the "User Agent" that your browser presents itself as.
 Simply install a Chrome or Firefox extension to customize your user agent,
 then select some Windows or pre-Catalina value from https://techblog.willshouse.com/2012/01/03/most-common-user-agents/ (or wherever), and refresh your "Loans" page.
 
+**New** (as of 2022-02):
+you must now also click the "Do you have the OverDrive app? >" disclosure/dropdown
+to get the "Download MP3 audiobook" link to show up.
+
 ---
 
 I call this a "standalone" script,
