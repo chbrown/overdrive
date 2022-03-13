@@ -77,6 +77,19 @@ Try running the `chmod +x` command from the [Instructions](#instructions).
 
 ---
 
+If calling the script with any combination of options produces an error message like
+```console
+.local/bin/overdrive: line 1: syntax error near unexpected token `newline'
+.local/bin/overdrive: line 1: `<!DOCTYPE html>'
+```
+this indicates you installed the script incorrectly.
+You most likely saved the GitHub webpage that displays the source code, instead of just the source code.
+To fix, follow the [Instructions](#instructions) _exactly_ as shown.
+
+If you are security conscious 🧐 (good for you!), feel free to `cat -n ~/.local/bin/overdrive` after installing, but before executing the script for the first time.
+
+---
+
 If the script fails right after a `curl` call, and then you rerun it with `--verbose` and get an error message like `curl: (60) SSL certificate problem: certificate has expired`,
 that indicates the OverDrive server cannot be verified from your system's certificate authority.
 You can bypass the security check by adding `--insecure` when calling the `overdrive` script.
