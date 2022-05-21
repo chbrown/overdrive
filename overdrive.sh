@@ -292,7 +292,7 @@ download() {
   # For each of the parts of the book listed in `Novel.odm`, make a request to another OverDrive endpoint,
   # which will validate the request and redirect to the actual MP3 file on their CDN,
   # and save the result into a folder in the current directory, named like `Author - Title/Part0N.mp3`.
-  while read -r path; do
+  for path in $(extract_filenames "$1"); do
     # delete from path up until the last hyphen to the get Part0N.mp3 suffix
     suffix=${path##*-}
     output="$dir/$suffix"
@@ -313,10 +313,10 @@ download() {
         return $STATUS
       fi
     fi
-  done < <(extract_filenames "$1")
+  done
 
   # Loop over CoverUrl(s), since there may be none
-  while read -r CoverUrl; do
+  for CoverUrl in $(extract_coverUrl "$metadata_path" | head -1); do
     >&2 printf 'Using CoverUrl=%s\n' "$CoverUrl"
     if [[ -n "$CoverUrl" ]]; then
         cover_output=$dir/folder.jpg
@@ -334,7 +334,7 @@ download() {
     else
       >&2 printf 'Cover image not available\n'
     fi
-  done < <(extract_coverUrl "$metadata_path" | head -1)
+  done
 }
 
 early_return() {
