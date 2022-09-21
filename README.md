@@ -77,6 +77,11 @@ Try running the `chmod +x` command from the [Instructions](#instructions).
 
 ---
 
+If you see a line that reads `I/O error : Operation not permitted`,
+you probably didn't [allow Terminal / iTerm2 to access your Downloads folder](https://www.google.com/search?q=allow+terminal+access+downloads+folder+macos).
+
+---
+
 If calling the script with any combination of options produces an error message like
 ```console
 .local/bin/overdrive: line 1: syntax error near unexpected token `newline'
@@ -124,14 +129,17 @@ the following package manager one-liners should help:
 
 | Command | OS |
 |:--------|:---|
-| `brew install openssl` | # macOS<sup>†</sup>
+| _N/A_<sup>†</sup> | # macOS
 | `apt-get install curl uuid-runtime libxml2-utils libc-bin openssl coreutils` | # Debian / Ubuntu
 | `apk add bash curl util-linux libxml2-utils openssl` | # Alpine
 | `pacman -S curl util-linux libxml2 openssl coreutils` | # Arch
 | `dnf install curl glibc-common util-linux libxml2 openssl coreutils` | # Fedora
 | (_please create a [PR](https://github.com/chbrown/overdrive/pulls) to contribute a new OS!_)
 
-<sup>†</sup>Though this is unnecessary; AFAICT, all required commands are installed by default on macOS 10.14 (Mojave).
+<sup>†</sup>All required commands are installed by default on macOS 10.14 (Mojave), 10.15 (Catalina), 12.6 (Monterey),
+and probably everywhere in between — those are just the versions I've personally tested.
+It also works with the latest version of OpenSSL,
+so if you want, `brew install openssl`.
 
 ---
 
