@@ -101,6 +101,11 @@ You can bypass the security check by adding `--insecure` when calling the `overd
 
 ---
 
+If you see a message like `The requested license is either invalid or already acquired`,
+you'll need to go back to your library and download a fresh ODM file.
+
+---
+
 If your library doesn't show you the link to "Download MP3 audiobook" (i.e., the `.odm` file),
 the easiest way to get it to (re)appear is to pretend to use an OS that they do support —
 by editing the "User Agent" that your browser presents itself as.
