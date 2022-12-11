@@ -110,9 +110,12 @@ you'll need to go back to your library and download a fresh ODM file.
 
 If your library doesn't show you the link to "Download MP3 audiobook" (i.e., the `.odm` file),
 the easiest way to get it to (re)appear is to pretend to use an OS that they do support —
-by editing the "User Agent" that your browser presents itself as.
-Simply install a Chrome or Firefox extension to customize your user agent,
-then select some Windows or pre-Catalina value from https://techblog.willshouse.com/2012/01/03/most-common-user-agents/ (or wherever), and refresh your "Loans" page.
+by editing the "User Agent" that your browser presents itself as:
+
+1. Install a [Chrome](https://chrome.google.com/webstore/detail/djflhoibgkdhkhhcedjiklpkjnoahfmg) or Firefox extension to customize your user agent.
+2. [Pick some mainstream value](https://techblog.willshouse.com/2012/01/03/most-common-user-agents/) for Windows or pre-Catalina.
+3. Configure your extension to use that value.
+4. Refresh your "Loans" page.
 
 **New** (as of 2022-02):
 you must now also click the "Do you have the OverDrive app? >" disclosure/dropdown
