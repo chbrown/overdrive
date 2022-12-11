@@ -71,16 +71,18 @@ It will also set all `curl` calls to not be silent.
 
 ### Common errors
 
+###### Permission denied (executable flag)
+
 If you get an error message like `-bash: ~/.local/bin/overdrive: Permission denied` or `zsh: permission denied: overdrive`,
 you installed `overdrive` to the right place 👍, but didn't set the executable flag 😟.
 Try running the `chmod +x` command from the [Instructions](#instructions).
 
----
+###### Folder access
 
 If you see a line that reads `I/O error : Operation not permitted`,
 you probably didn't [allow Terminal / iTerm2 to access your Downloads folder](https://www.google.com/search?q=allow+terminal+access+downloads+folder+macos).
 
----
+###### Syntax error (HTML vs. source)
 
 If calling the script with any combination of options produces an error message like
 ```console
@@ -93,18 +95,18 @@ To fix, follow the [Instructions](#instructions) _exactly_ as shown.
 
 If you are security conscious 🧐 (good for you!), feel free to `cat -n ~/.local/bin/overdrive` after installing, but before executing the script for the first time.
 
----
+###### SSL certificate
 
 If the script fails right after a `curl` call, and then you rerun it with `--verbose` and get an error message like `curl: (60) SSL certificate problem: certificate has expired`,
 that indicates the OverDrive server cannot be verified from your system's certificate authority.
 You can bypass the security check by adding `--insecure` when calling the `overdrive` script.
 
----
+###### Expired / used license
 
 If you see a message like `The requested license is either invalid or already acquired`,
 you'll need to go back to your library and download a fresh ODM file.
 
----
+###### Hidden download link
 
 If your library doesn't show you the link to "Download MP3 audiobook" (i.e., the `.odm` file),
 the easiest way to get it to (re)appear is to pretend to use an OS that they do support —
@@ -116,7 +118,7 @@ then select some Windows or pre-Catalina value from https://techblog.willshouse.
 you must now also click the "Do you have the OverDrive app? >" disclosure/dropdown
 to get the "Download MP3 audiobook" link to show up.
 
----
+###### Dependencies
 
 I call this a "standalone" script,
 but it actually depends on several executables being available on your `PATH`:
@@ -146,7 +148,7 @@ and probably everywhere in between — those are just the versions I've personal
 It also works with the latest version of OpenSSL,
 so if you want, `brew install openssl`.
 
----
+###### Issues not emails
 
 If none of that solves your problem,
 you can [open an issue](https://github.com/chbrown/overdrive/issues/new),
