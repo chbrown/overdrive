@@ -15,6 +15,42 @@ such as this script 😉
 
 Btw, it works on Linux too!
 
+## Libby
+
+This script _will_ stop working when OverDrive finally decides to stop supporting the "classic" OverDrive app.
+
+**You don't have to worry about this as long as you can download `.odm` files from your library!**
+
+<details>
+<summary>But if you do want to worry about it sooner rather than later, you can expand this...</summary>
+
+### On Libby <sub>and the impending <sub>demise of OverDrive</sub></sub> 🤪
+
+OverDrive has been making it harder to use the `.odm` flow for a while now,
+first [removing their OverDrive app from all app stores](https://company.overdrive.com/2021/08/09/important-update-regarding-libby-and-the-overdrive-app/),
+then adding [various hurdles](#hidden-download-link) around accessing the `.odm` file for a loan from your library's website.
+
+They've been threatening to shut it down for what seems like years,
+so 🤞 they keep that up for years to come.
+But lately it does sound like they're getting more serious;
+their [Libby propaganda page](https://resources.overdrive.com/libby/) reads:
+
+> To help your library welcome more users to Libby,
+> **the legacy OverDrive app is being discontinued in early 2023**.
+
+That and I've been getting more issues/notes about it,
+so here's my position:
+
+* This repo is not called `libby` and will not be retrofitted to accommodate Libby (if that's even possible).
+* This project has no interest in circumventing DRM or aiding others to circumvent DRM. Never has, never will.
+* I too am a user of this script, and I too regret the forced migration to Libby.
+* If/when OverDrive fully shuts down, I'll be on the hunt for another way to consume audiobooks from my local public library (❤️) in a format that fits my lifestyle.
+* If I find a good solution, I'll link to it from this README.
+
+I'm going to enjoy OverDrive while it lasts, and move on when it doesn't.
+
+[r/audiobooks](https://www.reddit.com/r/audiobooks/) seems like a nice community. Let's hang out there?
+</details>
 
 ## Instructions
 
