@@ -27,7 +27,7 @@ HELP
 
 MEDIA=()
 COMMANDS=()
-CURLOPTS=(-s -L -A "$UserAgent" --compressed)
+CURLOPTS=(-s -L -A "$UserAgent" --compressed --retry 3)
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
