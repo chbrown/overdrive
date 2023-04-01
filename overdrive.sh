@@ -28,6 +28,7 @@ HELP
 MEDIA=()
 COMMANDS=()
 CURLOPTS=(-s -L -A "$UserAgent" --compressed --retry 3)
+DIR_FORMAT='%s - %s'
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
@@ -45,6 +46,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --insecure)
       CURLOPTS+=("$1")
+      ;;
+    -o|--output)
+      shift
+      DIR_FORMAT=$1
       ;;
     *.odm)
       if [[ ! -e $1 ]]; then
@@ -285,7 +290,7 @@ download() {
   # prepare to download the parts
   baseurl=$(xmllint --xpath 'string(//Protocol[@method="download"]/@baseurl)' "$1")
 
-  dir=$(printf '%s - %s\n' "$Author" "$Title" | head -1)
+  dir=$(printf "$DIR_FORMAT\n" "$Author" "$Title" | head -1)
   >&2 printf 'Creating directory %s\n' "$dir"
   mkdir -p "$dir"
 
