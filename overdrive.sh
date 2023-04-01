@@ -285,7 +285,7 @@ download() {
   # prepare to download the parts
   baseurl=$(xmllint --xpath 'string(//Protocol[@method="download"]/@baseurl)' "$1")
 
-  dir="$Author - $Title"
+  dir=$(printf '%s - %s\n' "$Author" "$Title" | head -1)
   >&2 printf 'Creating directory %s\n' "$dir"
   mkdir -p "$dir"
 
