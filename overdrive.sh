@@ -4,7 +4,7 @@ set -e # exit immediately on first error
 set -o pipefail # propagate intermediate pipeline errors
 
 # should match `git describe --tags` with clean working tree
-VERSION=2.3.2
+VERSION=2.3.3
 
 OMC=1.2.0
 OS=10.11.6
