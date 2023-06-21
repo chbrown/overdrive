@@ -4,17 +4,21 @@ set -e # exit immediately on first error
 set -o pipefail # propagate intermediate pipeline errors
 
 # should match `git describe --tags` with clean working tree
+# tick up to 2.3.3.1?
 VERSION=2.3.3
 
 OMC=1.2.0
 OS=10.11.6
 # use same user agent as mobile app
 UserAgent='OverDrive Media Console'
+# static location of script on GH
+RemoteBase='https://raw.githubusercontent.com/chbrown/overdrive/master/overdrive.sh'
 
 usage() {
   >&2 cat <<HELP
 Usage: $(basename "$0") [-h|--help]
        $(basename "$0") --version
+       $(basename "$0") --update
        $(basename "$0") command [command2 ...] book.odm [book2.odm ...] [-v|--verbose]
 
 Commands:
@@ -23,6 +27,44 @@ Commands:
   info       Print the author, title, and total duration (in seconds) for each OverDrive loan file.
   metadata   Print all metadata from each OverDrive loan file.
 HELP
+}
+
+update() {
+  # Usage: --update
+  # Download the latest version of this script
+  echo "Updating..."
+  if curl "${CURLOPTS[@]}" \
+  	-o "$0.tmp" \
+  	"$RemoteBase"; then
+  	>&2 echo "Download successful."
+  else
+    STATUS=$?
+    >&2 print 'Failed downloading %s\n' "$RemoteBase"
+    rm -f "$0.tmp"
+    return $STATUS
+  fi
+  
+  # Retain modes
+  OCTAL_MODE=$(stat -c '%a' $0)
+  if ! chmod $OCTAL_MODE "$0.tmp" ; then
+    echo "Failed setting permissions on $0.tmp"
+    exit 1
+  fi
+  
+  # Spawn update script
+  cat > updateScript.sh << EOF
+#!/bin/bash
+# Overwrite old file with new
+if mv "$0.tmp" "$0"; then
+  echo "Update complete."
+  rm \$0
+else
+  echo "Replacement of $0 failed."
+fi
+EOF
+  
+  echo "Spawning update process..."
+  exec /bin/bash updateScript.sh
 }
 
 MEDIA=()
@@ -57,6 +99,10 @@ while [[ $# -gt 0 ]]; do
         exit 2 # ENOENT 2 No such file or directory
       fi
       MEDIA+=("$1")
+      ;;
+    --update)
+      update
+      exit 0
       ;;
     download|return|info|metadata)
       COMMANDS+=("$1")
