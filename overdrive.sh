@@ -3,6 +3,9 @@
 set -e # exit immediately on first error
 set -o pipefail # propagate intermediate pipeline errors
 
+# prefer system version of printf
+enable -n printf
+
 # should match `git describe --tags` with clean working tree
 VERSION=2.3.3
 
