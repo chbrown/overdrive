@@ -144,18 +144,11 @@ you'll need to go back to your library and download a fresh ODM file.
 
 ###### Hidden download link
 
-If your library doesn't show you the link to "Download MP3 audiobook" (i.e., the `.odm` file),
-the easiest way to get it to (re)appear is to pretend to use an OS that they do support —
-by editing the "User Agent" that your browser presents itself as:
+If your library doesn't show you the link to "Download MP3 audiobook" (i.e., the `.odm` file), there are several ways to make it appear.
 
-1. Install a [Chrome](https://chrome.google.com/webstore/detail/djflhoibgkdhkhhcedjiklpkjnoahfmg) or Firefox extension to customize your user agent.
-2. [Pick some mainstream value](https://techblog.willshouse.com/2012/01/03/most-common-user-agents/) for Windows or pre-Catalina.
-3. Configure your extension to use that value.
-4. Refresh your "Loans" page.
+- The easiest way is to install the [OverDrive .odm Download Button Firefox plugin](https://github.com/bemehiser/overdrive-mp3-button) which will make the "Listen now in browser" button change to "Download .odm file". The plugin does a "find and replace" on strings in the overdrive page. It runs entirely in your browser.
 
-**New** (as of 2022-02):
-you must now also click the "Do you have the OverDrive app? >" disclosure/dropdown
-to get the "Download MP3 audiobook" link to show up.
+- Instead of using the plugin, you can manually copy and edit the url. Right click on the "Listen now in browser" button and copy the url. Paste the url into the navigation bar, and edit the "audiobook-overdrive" path to "audiobook-mp3" before loading the page. This will download the .odm file.
 
 ###### Dependencies
 
