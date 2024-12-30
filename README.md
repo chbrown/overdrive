@@ -119,6 +119,10 @@ if you have problems with them please open issues on those repos, not here!
 
 * https://github.com/brianpipa/OverdriveMP3Downloader is a Java command line tool with similar functionality,
   I guess because Java is easier to use on Windows?
+* https://github.com/bemehiser/overdrive-mp3-button is a Firefox plugin:
+  > which will make the "Listen now in browser" button change to "Download .odm file".
+  > The plugin does a "find and replace" on strings in the overdrive page.
+  > It runs entirely in your browser.
 
 ## Debugging
 
