@@ -123,6 +123,11 @@ if you have problems with them please open issues on those repos, not here!
   > which will make the "Listen now in browser" button change to "Download .odm file".
   > The plugin does a "find and replace" on strings in the overdrive page.
   > It runs entirely in your browser.
+* https://gist.github.com/ping/b58ae66359691db1d08f929a9e57a03d
+  is a bookmarklet that does pretty much the same thing.
+* https://github.com/simon-techkid/OverDrive.Userscript
+  is a Tampermonkey userscript that also does pretty much the same thing,
+  along with some bulk operations.
 
 ## Debugging
 
