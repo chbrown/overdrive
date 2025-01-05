@@ -91,6 +91,34 @@ The rest of this README describes
 and [some automation tips](#advanced);
 if your book downloaded just fine, you don't need to worry about any of that 😁
 
+### Downloading `.odm` files
+
+As of 2024-11-13, libraries have stopped showing any 'Download MP3 audiobook' links,
+but still support downloading the `.odm` file for a valid loan.
+(_For now_...
+see [#64](https://github.com/chbrown/overdrive/issues/64),
+[#66](https://github.com/chbrown/overdrive/issues/66).)
+
+Let's assume you have successfully borrowed Blake Crouch's _Recursion_ from the New York Public Library.
+Go to the book's media page at `https://nypl.overdrive.com/media/4295342`,
+which will show a 'GO TO LOANS' button where there is usually a 'BORROW' button.
+
+Don't click that — instead, in your browser's navigation bar,
+edit the current URL and replace `media` with `media/download/audiobook-mp3`, then hit enter to trigger the request.
+This _should_ download the `.odm` file.
+
+(Alternatively, on your loans page, right click on the 'Listen now in browser' button and click 'Copy Link Address' — or whatever terminology your browser uses — to copy the URL.
+Paste this into your navigation bar, replace `audiobook-overdrive` with `audiobook-mp3` in the path, and then hit enter.)
+
+In other words, you want to request `https://nypl.overdrive.com/media/download/audiobook-mp3/4295342` with a simple HTTP GET, but using your browser so that your cookies are included as usual.
+
+### Third-party contributions
+
+The following are some resources that users have created or pointed out;
+if you have problems with them please open issues on those repos, not here!
+
+* https://github.com/brianpipa/OverdriveMP3Downloader is a Java command line tool with similar functionality,
+  I guess because Java is easier to use on Windows?
 
 ## Debugging
 
@@ -141,21 +169,6 @@ You can bypass the security check by adding `--insecure` when calling the `overd
 
 If you see a message like `The requested license is either invalid or already acquired`,
 you'll need to go back to your library and download a fresh ODM file.
-
-###### Hidden download link
-
-If your library doesn't show you the link to "Download MP3 audiobook" (i.e., the `.odm` file),
-the easiest way to get it to (re)appear is to pretend to use an OS that they do support —
-by editing the "User Agent" that your browser presents itself as:
-
-1. Install a [Chrome](https://chrome.google.com/webstore/detail/djflhoibgkdhkhhcedjiklpkjnoahfmg) or Firefox extension to customize your user agent.
-2. [Pick some mainstream value](https://techblog.willshouse.com/2012/01/03/most-common-user-agents/) for Windows or pre-Catalina.
-3. Configure your extension to use that value.
-4. Refresh your "Loans" page.
-
-**New** (as of 2022-02):
-you must now also click the "Do you have the OverDrive app? >" disclosure/dropdown
-to get the "Download MP3 audiobook" link to show up.
 
 ###### Dependencies
 
